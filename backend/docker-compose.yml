@@ -9,8 +9,11 @@ services:
       - N8N_HOST=${N8N_HOST:-localhost}
       - N8N_PROTOCOL=${N8N_PROTOCOL:-https}
       - WEBHOOK_URL=https://${N8N_HOST:-localhost}/
+      - N8N_PROXY_HOPS=1
+    entrypoint: ["sh", "-c", "n8n import:workflow --separate --input=/workflows && exec n8n"]
     volumes:
       - n8n_data:/home/node/.n8n
+      - ./workflows:/workflows:ro
     networks:
       - n8n_net
 
@@ -35,3 +38,4 @@ volumes:
 
 networks:
   n8n_net:
+
