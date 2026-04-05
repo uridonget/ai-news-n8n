@@ -1,0 +1,139 @@
+{
+  "id": "f1000001-0000-0000-0000-000000000000",
+  "name": "01. RSS 뉴스 수집",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "a0000001-0000-0000-0000-000000000000",
+      "name": "수동 실행",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [0, 500]
+    },
+    {
+      "parameters": { "url": "https://www.yonhapnewstv.co.kr/browse/feed/" },
+      "id": "a0000002-0000-0000-0000-000000000000",
+      "name": "연합뉴스TV",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [220, 0]
+    },
+    {
+      "parameters": { "url": "https://www.hani.co.kr/rss/" },
+      "id": "a0000003-0000-0000-0000-000000000000",
+      "name": "한겨레",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [220, 200]
+    },
+    {
+      "parameters": { "url": "https://www.khan.co.kr/rss/rssdata/total_news.xml" },
+      "id": "a0000004-0000-0000-0000-000000000000",
+      "name": "경향신문",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [220, 400]
+    },
+    {
+      "parameters": { "url": "https://news-ex.jtbc.co.kr/v1/get/rss/issue" },
+      "id": "a0000005-0000-0000-0000-000000000000",
+      "name": "JTBC",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [220, 600]
+    },
+    {
+      "parameters": { "url": "https://www.hankyung.com/feed/all-news" },
+      "id": "a0000006-0000-0000-0000-000000000000",
+      "name": "한국경제 전체",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [220, 800]
+    },
+    {
+      "parameters": { "url": "https://www.sedaily.com/rss/newsall" },
+      "id": "a0000007-0000-0000-0000-000000000000",
+      "name": "서울경제 전체",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [220, 1000]
+    },
+    {
+      "parameters": { "mode": "append" },
+      "id": "a0000008-0000-0000-0000-000000000000",
+      "name": "Merge 1",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [440, 100]
+    },
+    {
+      "parameters": { "mode": "append" },
+      "id": "a0000009-0000-0000-0000-000000000000",
+      "name": "Merge 2",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [660, 300]
+    },
+    {
+      "parameters": { "mode": "append" },
+      "id": "a000000a-0000-0000-0000-000000000000",
+      "name": "Merge 3",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [880, 500]
+    },
+    {
+      "parameters": { "mode": "append" },
+      "id": "a000000b-0000-0000-0000-000000000000",
+      "name": "Merge 4",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [1100, 700]
+    },
+    {
+      "parameters": { "mode": "append" },
+      "id": "a000000c-0000-0000-0000-000000000000",
+      "name": "Merge 5",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [1320, 900]
+    },
+    {
+      "parameters": {
+        "jsCode": "const titles = $input.all()\n  .map(item => item.json.title)\n  .filter(Boolean);\n\nreturn [\n  {\n    json: {\n      all_titles: titles.join('\\n'),\n      count: titles.length\n    }\n  }\n];"
+      },
+      "id": "a000000d-0000-0000-0000-000000000000",
+      "name": "제목 취합",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1540, 900]
+    }
+  ],
+  "connections": {
+    "수동 실행": {
+      "main": [[
+        { "node": "연합뉴스TV",   "type": "main", "index": 0 },
+        { "node": "한겨레",       "type": "main", "index": 0 },
+        { "node": "경향신문",     "type": "main", "index": 0 },
+        { "node": "JTBC",        "type": "main", "index": 0 },
+        { "node": "한국경제 전체", "type": "main", "index": 0 },
+        { "node": "서울경제 전체", "type": "main", "index": 0 }
+      ]]
+    },
+    "연합뉴스TV":   { "main": [[{ "node": "Merge 1", "type": "main", "index": 0 }]] },
+    "한겨레":       { "main": [[{ "node": "Merge 1", "type": "main", "index": 1 }]] },
+    "Merge 1":     { "main": [[{ "node": "Merge 2", "type": "main", "index": 0 }]] },
+    "경향신문":     { "main": [[{ "node": "Merge 2", "type": "main", "index": 1 }]] },
+    "Merge 2":     { "main": [[{ "node": "Merge 3", "type": "main", "index": 0 }]] },
+    "JTBC":        { "main": [[{ "node": "Merge 3", "type": "main", "index": 1 }]] },
+    "Merge 3":     { "main": [[{ "node": "Merge 4", "type": "main", "index": 0 }]] },
+    "한국경제 전체": { "main": [[{ "node": "Merge 4", "type": "main", "index": 1 }]] },
+    "Merge 4":     { "main": [[{ "node": "Merge 5", "type": "main", "index": 0 }]] },
+    "서울경제 전체": { "main": [[{ "node": "Merge 5", "type": "main", "index": 1 }]] },
+    "Merge 5":     { "main": [[{ "node": "제목 취합", "type": "main", "index": 0 }]] }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
