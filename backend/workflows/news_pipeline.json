@@ -51,7 +51,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const allTitles = $input.first().json.all_titles;\n\nconst prompt = [\n  '다음은 오늘 뉴스 헤드라인 제목 목록입니다.',\n  '현재 가장 중요하고 관심을 가질 만한 검색 키워드 3개를 선정해주세요.',\n  'IT에 관심이 많고 세계, 사회 순서로 관심이 있습니다.',\n  '유사하거나 중복 의미의 키워드는 최소화하세요.',\n  '서두나 부연 설명 없이 키워드 3개만 쉼표(,)로 구분해 한 줄로만 답변하세요.',\n  '',\n  '[답변 예시]',\n  'A, B, C',\n  '',\n  '[제목 목록]',\n  allTitles\n].join('\\n');\n\nreturn [{\n  json: {\n    contents: [{\n      parts: [{ text: prompt }]\n    }]\n  }\n}];"
+        "jsCode": "const allTitles = $input.first().json.all_titles;\n\nconst prompt = [\n  '다음은 오늘 뉴스 헤드라인 제목 목록입니다.',\n  '현재 가장 중요하고 관심을 가질 만한 검색 키워드 10개를 선정해주세요.',\n  'IT에 관심이 많고 세계, 사회 순서로 관심이 있습니다.',\n  '유사하거나 중복 의미의 키워드는 최소화하세요.',\n  '서두나 부연 설명 없이 키워드 10개만 쉼표(,)로 구분해 한 줄로만 답변하세요.',\n  '',\n  '[답변 예시]',\n  'A, B, C, D, E, F, G, H, I, J',\n  '',\n  '[제목 목록]',\n  allTitles\n].join('\\n');\n\nreturn [{\n  json: {\n    contents: [{\n      parts: [{ text: prompt }]\n    }]\n  }\n}];"
       },
       "id": "n0000000e-0000-0000-0000-000000000000",
       "name": "프롬프트 생성",
@@ -291,7 +291,7 @@
     {
       "parameters": {
         "resume": "timeInterval",
-        "amount": 5,
+        "amount": 30,
         "unit": "seconds"
       },
       "id": "n00000021-0000-0000-0000-000000000000",
