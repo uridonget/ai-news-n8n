@@ -162,7 +162,8 @@
   bottom: calc(100% + 8px);
   left: 50%;
   transform: translateX(-50%);
-  background: #1a1a1a;
+  background: rgba(100, 100, 100, 0.75);
+  backdrop-filter: blur(4px);
   color: #fff;
   font-size: 0.8rem;
   line-height: 1.55;
@@ -182,5 +183,5 @@
   left: 50%;
   transform: translateX(-50%);
   border: 5px solid transparent;
-  border-top-color: #1a1a1a;
+  border-top-color: rgba(100, 100, 100, 0.75);
 }
