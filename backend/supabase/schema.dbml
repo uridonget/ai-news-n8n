@@ -1,0 +1,38 @@
+// Use DBML to define your database structure
+// Docs: https://dbml.dbdiagram.io/docs
+// Visualize: https://dbdiagram.io
+
+Table dates {
+  id         bigint      [primary key, increment]
+  date       date        [not null, default: 'CURRENT_DATE']
+  period     text        [not null, default: '오전', note: "'오전' | '오후'"]
+  created_at timestamptz [default: 'now()']
+
+  indexes {
+    (date, period) [unique]
+  }
+}
+
+Table topics {
+  id         bigint      [primary key, increment]
+  date_id    bigint      [not null, ref: > dates.id]
+  topic_text text        [not null]
+  created_at timestamptz [default: 'now()']
+}
+
+Table articles {
+  id             bigint [primary key, increment]
+  topic_id       bigint [not null, ref: > topics.id]
+  title          text
+  publisher      text
+  url            text   [unique, note: '중복 방지']
+  content        text
+  published_date date   [not null, default: 'CURRENT_DATE']
+}
+
+Table summaries {
+  id               bigint [primary key, increment]
+  topic_id         bigint [unique, not null, ref: - topics.id, note: '토픽당 요약 1개']
+  summary_text     text
+  term_explanation text
+}
