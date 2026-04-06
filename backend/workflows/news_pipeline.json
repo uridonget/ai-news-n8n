@@ -6,8 +6,8 @@
       "parameters": {
         "rule": {
           "interval": [
-            { "field": "cronExpression", "expression": "0 7 * * *" },
-            { "field": "cronExpression", "expression": "0 18 * * *" }
+            { "field": "cronExpression", "expression": "0 22 * * *" },
+            { "field": "cronExpression", "expression": "0 9 * * *" }
           ]
         }
       },
@@ -247,7 +247,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const { keyword, articles_text, topic_id } = $input.first().json;\n\nconst prompt = [\n  '당신은 전문 뉴스 애널리스트입니다.',\n  `아래는 '${keyword}'와 관련된 기사 본문입니다.`,\n  '',\n  '[기사 묶음]',\n  articles_text,\n  '',\n  '[요청]',\n  '1. 모든 기사를 종합해 핵심 상황을 완결된 문단으로 요약해주세요.',\n  '2. 전문 용어를 골라 초등학생도 이해할 수 있도록 쉽게 설명해주세요.',\n  '',\n  '[답변 형식]',\n  '### 요약 ###',\n  '(요약 내용)',\n  '### 용어 설명 ###',\n  '- **용어1:** (설명)'\n].join('\\n');\n\nreturn [{\n  json: {\n    topic_id,\n    contents: [{ parts: [{ text: prompt }] }]\n  }\n}];"
+        "jsCode": "const { keyword, articles_text, topic_id } = $input.first().json;\n\nconst prompt = [\n  '당신은 전문 뉴스 애널리스트입니다.',\n  `아래는 '${keyword}'와 관련된 기사 본문입니다.`,\n  '',\n  '[기사 묶음]',\n  articles_text,\n  '',\n  '[지시사항]',\n  '1. 모든 기사를 종합해 3~5문장으로 핵심 상황을 요약하세요.',\n  '2. 전문 용어 3~5개를 골라 초등학생도 이해할 수 있게 설명하세요.',\n  '',\n  '[답변 규칙 - 반드시 준수]',\n  '- 아래 형식을 한 글자도 바꾸지 말고 그대로 사용하세요.',\n  '- ### 요약 ### 과 ### 용어 설명 ### 사이에 구분선(--)이나 다른 텍스트를 절대 넣지 마세요.',\n  '- 두 섹션 외의 어떤 머리말, 인사말, 부연 설명도 출력하지 마세요.',\n  '',\n  '[답변 형식]',\n  '### 요약 ###',\n  '(요약 내용만 작성)',\n  '### 용어 설명 ###',\n  '- **용어:** (설명)'\n].join('\\n');\n\nreturn [{\n  json: {\n    topic_id,\n    contents: [{ parts: [{ text: prompt }] }]\n  }\n}];"
       },
       "id": "n0000001d-0000-0000-0000-000000000000",
       "name": "요약 프롬프트 생성",
@@ -268,7 +268,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const text = $input.first().json.candidates[0].content.parts[0].text;\nconst topic_id = $node['요약 프롬프트 생성'].json.topic_id;\n\nconst summaryMatch = text.match(/### 요약 ###\\n([\\s\\S]*?)(?=### 용어 설명 ###|$)/);\nconst termsMatch   = text.match(/### 용어 설명 ###\\n([\\s\\S]*)$/);\n\nconst summary_text     = summaryMatch ? summaryMatch[1].trim() : text.trim();\nconst term_explanation = termsMatch   ? termsMatch[1].trim()   : '';\n\nreturn [{ json: { topic_id, summary_text, term_explanation } }];"
+        "jsCode": "const text = $input.first().json.candidates[0].content.parts[0].text;\nconst topic_id = $node['요약 프롬프트 생성'].json.topic_id;\n\n// ##, ### 등 다양한 헤딩 형식 허용\nconst summaryMatch = text.match(/#+\\s*요약\\s*#+\\s*\\n([\\s\\S]*?)(?=#+\\s*용어|$)/);\nconst termsMatch   = text.match(/#+\\s*용어\\s*설명?\\s*#+\\s*\\n([\\s\\S]*)$/);\n\nconst summary_text     = summaryMatch ? summaryMatch[1].trim() : text.trim();\nconst term_explanation = termsMatch   ? termsMatch[1].trim()   : '';\n\nreturn [{ json: { topic_id, summary_text, term_explanation } }];"
       },
       "id": "n0000001f-0000-0000-0000-000000000000",
       "name": "요약 파싱",
