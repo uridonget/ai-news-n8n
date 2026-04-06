@@ -107,6 +107,20 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [1540, 900]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "f2000002-0000-0000-0000-000000000000",
+          "mode": "id"
+        }
+      },
+      "id": "a000000e-0000-0000-0000-000000000000",
+      "name": "02. Gemini 키워드 추출",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 2,
+      "position": [1760, 900]
     }
   ],
   "connections": {
@@ -130,7 +144,8 @@
     "한국경제 전체": { "main": [[{ "node": "Merge 4", "type": "main", "index": 1 }]] },
     "Merge 4":     { "main": [[{ "node": "Merge 5", "type": "main", "index": 0 }]] },
     "서울경제 전체": { "main": [[{ "node": "Merge 5", "type": "main", "index": 1 }]] },
-    "Merge 5":     { "main": [[{ "node": "제목 취합", "type": "main", "index": 0 }]] }
+    "Merge 5":     { "main": [[{ "node": "제목 취합", "type": "main", "index": 0 }]] },
+    "제목 취합":    { "main": [[{ "node": "02. Gemini 키워드 추출", "type": "main", "index": 0 }]] }
   },
   "active": false,
   "settings": {
