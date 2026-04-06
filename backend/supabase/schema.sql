@@ -36,9 +36,7 @@ CREATE TABLE articles (
   id             bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
   topic_id       bigint NOT NULL REFERENCES topics(id),
   title          text,
-  publisher      text,
   url            text   UNIQUE, -- 중복 방지
-  content        text,
   published_date date   NOT NULL DEFAULT CURRENT_DATE
 );
 

@@ -1,3 +1,5 @@
 plan.txt
 backend/.env
 backend/certs/
+frontend/.env
+frontend/node_modules/
