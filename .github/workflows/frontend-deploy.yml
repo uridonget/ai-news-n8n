@@ -1,0 +1,45 @@
+name: Frontend Deploy
+
+on:
+  push:
+    branches: [ "main" ]
+    paths: [ "frontend/**" ]
+
+jobs:
+  s3_frontend_deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: React Build
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+        run: |
+          npm install
+          npm run build
+
+      - name: AWS IAM user define
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
+      - name: S3 upload
+        run: aws s3 sync dist/ s3://${{ secrets.AWS_S3_FRONTEND_BUCKET }} --delete
+
+      - name: Invalidate CloudFront
+        uses: chetan/invalidate-cloudfront-action@v2
+        env:
+          DISTRIBUTION: ${{ secrets.AWS_S3_FRONTEND_CLOUDFRONT_ID }}
+          PATHS: "/*"
+          AWS_REGION: ap-northeast-2
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
