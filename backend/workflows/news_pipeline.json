@@ -3,11 +3,18 @@
   "name": "뉴스 파이프라인",
   "nodes": [
     {
-      "parameters": {},
+      "parameters": {
+        "rule": {
+          "interval": [
+            { "field": "cronExpression", "expression": "0 7 * * *" },
+            { "field": "cronExpression", "expression": "0 18 * * *" }
+          ]
+        }
+      },
       "id": "n00000001-0000-0000-0000-000000000000",
-      "name": "수동 실행",
-      "type": "n8n-nodes-base.manualTrigger",
-      "typeVersion": 1,
+      "name": "스케줄 트리거",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
       "position": [0, 500]
     },
 
@@ -303,7 +310,7 @@
     }
   ],
   "connections": {
-    "수동 실행": {
+    "스케줄 트리거": {
       "main": [[
         { "node": "연합뉴스TV",   "type": "main", "index": 0 },
         { "node": "한겨레",       "type": "main", "index": 0 },
@@ -350,6 +357,6 @@
     "summaries UPSERT": { "main": [[{ "node": "5초 대기",           "type": "main", "index": 0 }]] },
     "5초 대기":         { "main": [[{ "node": "Loop Over Items",     "type": "main", "index": 0 }]] }
   },
-  "active": false,
+  "active": true,
   "settings": {}
 }
