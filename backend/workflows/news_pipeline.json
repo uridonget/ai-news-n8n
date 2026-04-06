@@ -1,0 +1,174 @@
+{
+  "id": "f0000001-0000-0000-0000-000000000000",
+  "name": "01. 뉴스 파이프라인",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "n00000001-0000-0000-0000-000000000000",
+      "name": "수동 실행",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [0, 500]
+    },
+
+    { "parameters": { "url": "https://www.yonhapnewstv.co.kr/browse/feed/" },
+      "id": "n00000002-0000-0000-0000-000000000000", "name": "연합뉴스TV",
+      "type": "n8n-nodes-base.rssFeedRead", "typeVersion": 1, "position": [200, 0] },
+    { "parameters": { "url": "https://www.hani.co.kr/rss/" },
+      "id": "n00000003-0000-0000-0000-000000000000", "name": "한겨레",
+      "type": "n8n-nodes-base.rssFeedRead", "typeVersion": 1, "position": [200, 200] },
+    { "parameters": { "url": "https://www.khan.co.kr/rss/rssdata/total_news.xml" },
+      "id": "n00000004-0000-0000-0000-000000000000", "name": "경향신문",
+      "type": "n8n-nodes-base.rssFeedRead", "typeVersion": 1, "position": [200, 400] },
+    { "parameters": { "url": "https://news-ex.jtbc.co.kr/v1/get/rss/issue" },
+      "id": "n00000005-0000-0000-0000-000000000000", "name": "JTBC",
+      "type": "n8n-nodes-base.rssFeedRead", "typeVersion": 1, "position": [200, 600] },
+    { "parameters": { "url": "https://www.hankyung.com/feed/all-news" },
+      "id": "n00000006-0000-0000-0000-000000000000", "name": "한국경제 전체",
+      "type": "n8n-nodes-base.rssFeedRead", "typeVersion": 1, "position": [200, 800] },
+    { "parameters": { "url": "https://www.sedaily.com/rss/newsall" },
+      "id": "n00000007-0000-0000-0000-000000000000", "name": "서울경제 전체",
+      "type": "n8n-nodes-base.rssFeedRead", "typeVersion": 1, "position": [200, 1000] },
+
+    { "parameters": { "mode": "append" }, "id": "n00000008-0000-0000-0000-000000000000",
+      "name": "Merge 1", "type": "n8n-nodes-base.merge", "typeVersion": 2, "position": [420, 100] },
+    { "parameters": { "mode": "append" }, "id": "n00000009-0000-0000-0000-000000000000",
+      "name": "Merge 2", "type": "n8n-nodes-base.merge", "typeVersion": 2, "position": [620, 300] },
+    { "parameters": { "mode": "append" }, "id": "n0000000a-0000-0000-0000-000000000000",
+      "name": "Merge 3", "type": "n8n-nodes-base.merge", "typeVersion": 2, "position": [820, 500] },
+    { "parameters": { "mode": "append" }, "id": "n0000000b-0000-0000-0000-000000000000",
+      "name": "Merge 4", "type": "n8n-nodes-base.merge", "typeVersion": 2, "position": [1020, 700] },
+    { "parameters": { "mode": "append" }, "id": "n0000000c-0000-0000-0000-000000000000",
+      "name": "Merge 5", "type": "n8n-nodes-base.merge", "typeVersion": 2, "position": [1220, 900] },
+
+    {
+      "parameters": {
+        "jsCode": "const titles = $input.all()\n  .map(item => item.json.title)\n  .filter(Boolean);\n\nreturn [\n  {\n    json: {\n      all_titles: titles.join('\\n'),\n      count: titles.length\n    }\n  }\n];"
+      },
+      "id": "n0000000d-0000-0000-0000-000000000000",
+      "name": "제목 취합",
+      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [1440, 900]
+    },
+    {
+      "parameters": {
+        "jsCode": "const allTitles = $input.first().json.all_titles;\n\nconst prompt = [\n  '다음은 오늘 뉴스 헤드라인 제목 목록입니다.',\n  '현재 가장 중요하고 관심을 가질 만한 검색 키워드 10개를 선정해주세요.',\n  'IT에 관심이 많고 세계, 사회 순서로 관심이 있습니다.',\n  '유사하거나 중복 의미의 키워드는 최소화하세요.',\n  '서두나 부연 설명 없이 키워드 10개만 쉼표(,)로 구분해 한 줄로만 답변하세요.',\n  '',\n  '[답변 예시]',\n  'A, B, C, D, E, F, G, H, I, J',\n  '',\n  '[제목 목록]',\n  allTitles\n].join('\\n');\n\nreturn [{\n  json: {\n    contents: [{\n      parts: [{ text: prompt }]\n    }]\n  }\n}];"
+      },
+      "id": "n0000000e-0000-0000-0000-000000000000",
+      "name": "프롬프트 생성",
+      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [1660, 900]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent?key={{ $env.GEMINI_API_KEY }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "n0000000f-0000-0000-0000-000000000000",
+      "name": "Gemini API",
+      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [1880, 900]
+    },
+    {
+      "parameters": {
+        "jsCode": "const text = $input.first().json.candidates[0].content.parts[0].text;\n\nconst keywords = text\n  .split(',')\n  .map(k => k.replace(/[*#\\n]/g, '').trim())\n  .filter(k => k.length > 0 && k.length <= 20);\n\nconst date = new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Seoul' });\nconst hour = parseInt(\n  new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul', hour: 'numeric', hour12: false })\n);\nconst period = hour < 12 ? '오전' : '오후';\n\nreturn [{ json: { keywords, date, period } }];"
+      },
+      "id": "n00000010-0000-0000-0000-000000000000",
+      "name": "준비",
+      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [2100, 900]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SUPABASE_URL + '/rest/v1/dates?on_conflict=date,period' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey",        "value": "={{ $env.SUPABASE_SERVICE_ROLE_KEY }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $env.SUPABASE_SERVICE_ROLE_KEY }}" },
+            { "name": "Prefer",        "value": "resolution=merge-duplicates,return=representation" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { date: $json.date, period: $json.period } }}",
+        "options": {}
+      },
+      "id": "n00000011-0000-0000-0000-000000000000",
+      "name": "dates UPSERT",
+      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [2320, 900]
+    },
+    {
+      "parameters": {
+        "jsCode": "const datesRow = $input.first().json;\nconst date_id = (Array.isArray(datesRow) ? datesRow[0] : datesRow).id;\n\nconst { keywords, period } = $node['준비'].json;\n\nreturn keywords.map(keyword => ({ json: { date_id, keyword, period } }));"
+      },
+      "id": "n00000012-0000-0000-0000-000000000000",
+      "name": "topics 생성 준비",
+      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [2540, 900]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SUPABASE_URL + '/rest/v1/topics' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey",        "value": "={{ $env.SUPABASE_SERVICE_ROLE_KEY }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $env.SUPABASE_SERVICE_ROLE_KEY }}" },
+            { "name": "Prefer",        "value": "return=representation" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { date_id: $json.date_id, topic_text: $json.keyword } }}",
+        "options": {}
+      },
+      "id": "n00000013-0000-0000-0000-000000000000",
+      "name": "Supabase topics 저장",
+      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [2760, 900]
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map(item => {\n  const row = Array.isArray(item.json) ? item.json[0] : item.json;\n  return {\n    json: {\n      topic_id: row.id,\n      keyword:  row.topic_text,\n      period:   $node['준비'].json.period\n    }\n  };\n});"
+      },
+      "id": "n00000014-0000-0000-0000-000000000000",
+      "name": "응답 정리",
+      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [2980, 900]
+    }
+  ],
+  "connections": {
+    "수동 실행": {
+      "main": [[
+        { "node": "연합뉴스TV",   "type": "main", "index": 0 },
+        { "node": "한겨레",       "type": "main", "index": 0 },
+        { "node": "경향신문",     "type": "main", "index": 0 },
+        { "node": "JTBC",        "type": "main", "index": 0 },
+        { "node": "한국경제 전체", "type": "main", "index": 0 },
+        { "node": "서울경제 전체", "type": "main", "index": 0 }
+      ]]
+    },
+    "연합뉴스TV":   { "main": [[{ "node": "Merge 1", "type": "main", "index": 0 }]] },
+    "한겨레":       { "main": [[{ "node": "Merge 1", "type": "main", "index": 1 }]] },
+    "Merge 1":     { "main": [[{ "node": "Merge 2", "type": "main", "index": 0 }]] },
+    "경향신문":     { "main": [[{ "node": "Merge 2", "type": "main", "index": 1 }]] },
+    "Merge 2":     { "main": [[{ "node": "Merge 3", "type": "main", "index": 0 }]] },
+    "JTBC":        { "main": [[{ "node": "Merge 3", "type": "main", "index": 1 }]] },
+    "Merge 3":     { "main": [[{ "node": "Merge 4", "type": "main", "index": 0 }]] },
+    "한국경제 전체": { "main": [[{ "node": "Merge 4", "type": "main", "index": 1 }]] },
+    "Merge 4":     { "main": [[{ "node": "Merge 5", "type": "main", "index": 0 }]] },
+    "서울경제 전체": { "main": [[{ "node": "Merge 5", "type": "main", "index": 1 }]] },
+    "Merge 5":          { "main": [[{ "node": "제목 취합",          "type": "main", "index": 0 }]] },
+    "제목 취합":         { "main": [[{ "node": "프롬프트 생성",       "type": "main", "index": 0 }]] },
+    "프롬프트 생성":      { "main": [[{ "node": "Gemini API",         "type": "main", "index": 0 }]] },
+    "Gemini API":       { "main": [[{ "node": "준비",                "type": "main", "index": 0 }]] },
+    "준비":             { "main": [[{ "node": "dates UPSERT",        "type": "main", "index": 0 }]] },
+    "dates UPSERT":     { "main": [[{ "node": "topics 생성 준비",    "type": "main", "index": 0 }]] },
+    "topics 생성 준비": { "main": [[{ "node": "Supabase topics 저장","type": "main", "index": 0 }]] },
+    "Supabase topics 저장": { "main": [[{ "node": "응답 정리",       "type": "main", "index": 0 }]] }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
