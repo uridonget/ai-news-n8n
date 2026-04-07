@@ -46,6 +46,7 @@ function splitByTerms(text, terms) {
 
 function TermHighlight({ content, definition }) {
   const [visible, setVisible] = useState(false)
+  const spanRef = useRef(null)
   const tooltipRef = useRef(null)
 
   // 툴팁이 화면 밖으로 벗어나지 않도록 위치 보정
@@ -69,11 +70,23 @@ function TermHighlight({ content, definition }) {
     }
   }, [visible])
 
+  // 다른 영역 클릭 시 닫기
+  useEffect(() => {
+    if (!visible) return
+    function handleOutside(e) {
+      if (spanRef.current && !spanRef.current.contains(e.target)) {
+        setVisible(false)
+      }
+    }
+    document.addEventListener('pointerdown', handleOutside)
+    return () => document.removeEventListener('pointerdown', handleOutside)
+  }, [visible])
+
   return (
     <span
-      className="term-highlight"
-      onPointerEnter={() => setVisible(true)}
-      onPointerLeave={() => setVisible(false)}
+      ref={spanRef}
+      className={`term-highlight ${visible ? 'term-highlight--active' : ''}`}
+      onClick={() => setVisible(v => !v)}
     >
       {content}
       {visible && (
