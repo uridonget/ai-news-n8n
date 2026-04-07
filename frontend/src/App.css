@@ -153,10 +153,6 @@
   position: relative;
 }
 
-.term-highlight--active {
-  background: #fde047;
-}
-
 .term-tooltip {
   position: absolute;
   bottom: calc(100% + 8px);
@@ -169,7 +165,7 @@
   line-height: 1.55;
   padding: 8px 12px;
   border-radius: 7px;
-  width: 240px;
+  width: min(240px, calc(100vw - 32px));
   z-index: 100;
   text-align: left;
   white-space: normal;
