@@ -11,7 +11,6 @@ function decodeEntities(str) {
     .replace(/&apos;/g, "'")
 }
 
-// "- **용어:** 설명" 형식에서 {용어: 설명} 추출
 function parseTerms(text) {
   if (!text) return {}
   const terms = {}
@@ -25,53 +24,72 @@ function parseTerms(text) {
   return terms
 }
 
-// summary 텍스트를 일반 텍스트/하이라이트 세그먼트로 분할
+// 각 용어의 첫 번째 등장에만 하이라이트 적용
 function splitByTerms(text, terms) {
   const keys = Object.keys(terms)
   if (!text || keys.length === 0) return [{ type: 'text', content: text }]
 
+  const seen = new Set()
   const escaped = keys
     .sort((a, b) => b.length - a.length)
     .map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
   const pattern = new RegExp(`(${escaped.join('|')})`, 'g')
 
-  return text.split(pattern).map(part => ({
-    type: terms[part] !== undefined ? 'term' : 'text',
-    content: part,
-    definition: terms[part],
-  }))
+  return text.split(pattern).map(part => {
+    if (terms[part] !== undefined && !seen.has(part)) {
+      seen.add(part)
+      return { type: 'term', content: part, definition: terms[part] }
+    }
+    return { type: 'text', content: part }
+  })
+}
+
+function TermHighlight({ content, definition }) {
+  const [visible, setVisible] = useState(false)
+  const tooltipRef = useRef(null)
+
+  // 툴팁이 화면 밖으로 벗어나지 않도록 위치 보정
+  useEffect(() => {
+    if (!visible || !tooltipRef.current) return
+    const tooltip = tooltipRef.current
+    const rect = tooltip.getBoundingClientRect()
+    const vw = window.innerWidth
+
+    tooltip.style.left = ''
+    tooltip.style.right = ''
+    tooltip.style.transform = 'translateX(-50%)'
+
+    if (rect.right > vw - 8) {
+      tooltip.style.left = 'auto'
+      tooltip.style.right = '0'
+      tooltip.style.transform = 'none'
+    } else if (rect.left < 8) {
+      tooltip.style.left = '0'
+      tooltip.style.transform = 'none'
+    }
+  }, [visible])
+
+  return (
+    <span
+      className="term-highlight"
+      onPointerEnter={() => setVisible(true)}
+      onPointerLeave={() => setVisible(false)}
+    >
+      {content}
+      {visible && (
+        <span ref={tooltipRef} className="term-tooltip">{definition}</span>
+      )}
+    </span>
+  )
 }
 
 function HighlightedSummary({ text, terms }) {
-  const [activeTerm, setActiveTerm] = useState(null)
-  const ref = useRef(null)
-
-  useEffect(() => {
-    function handleClick(e) {
-      if (ref.current && !ref.current.contains(e.target)) {
-        setActiveTerm(null)
-      }
-    }
-    document.addEventListener('mousedown', handleClick)
-    return () => document.removeEventListener('mousedown', handleClick)
-  }, [])
-
   const segments = splitByTerms(text, terms)
-
   return (
-    <p className="card__text" ref={ref}>
+    <p className="card__text">
       {segments.map((seg, i) =>
         seg.type === 'term' ? (
-          <span
-            key={i}
-            className={`term-highlight ${activeTerm === i ? 'term-highlight--active' : ''}`}
-            onClick={() => setActiveTerm(activeTerm === i ? null : i)}
-          >
-            {seg.content}
-            {activeTerm === i && (
-              <span className="term-tooltip">{seg.definition}</span>
-            )}
-          </span>
+          <TermHighlight key={i} content={seg.content} definition={seg.definition} />
         ) : (
           <span key={i}>{seg.content}</span>
         )
