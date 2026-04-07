@@ -15,38 +15,76 @@
   z-index: 10;
 }
 
-.date-title {
-  font-size: 1.6rem;
+/* ── DatePicker ── */
+.datepicker {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-bottom: 14px;
+}
+
+.datepicker__nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.datepicker__arrow {
+  background: none;
+  border: 1px solid #c8c8c8;
+  border-radius: 5px;
+  width: 30px;
+  height: 30px;
+  font-size: 1.1rem;
+  color: #555;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.12s, color 0.12s;
+  line-height: 1;
+}
+
+.datepicker__arrow:hover:not(:disabled) {
+  background: #dcdcdc;
+  color: #111;
+}
+
+.datepicker__arrow:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.datepicker__date {
+  font-size: 1.4rem;
   font-weight: 700;
   color: #222;
-  margin: 0 0 16px;
   letter-spacing: -0.02em;
 }
 
-.date-tabs {
+.datepicker__periods {
   display: flex;
   gap: 6px;
-  flex-wrap: wrap;
 }
 
-.tab {
-  padding: 6px 14px;
-  border-radius: 6px 6px 0 0;
+.datepicker__period {
+  padding: 4px 14px;
+  border-radius: 5px 5px 0 0;
   border: 1px solid #d0d0d0;
   border-bottom: none;
   background: #dcdcdc;
   color: #555;
   font-size: 0.82rem;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition: background 0.12s, color 0.12s;
 }
 
-.tab:hover {
+.datepicker__period:hover {
   background: #cecece;
   color: #222;
 }
 
-.tab--active {
+.datepicker__period--active {
   background: #f0f0f0;
   color: #111;
   font-weight: 600;

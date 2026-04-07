@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from './supabaseClient'
 import TopicCard from './TopicCard'
+import DatePicker from './DatePicker'
 import './App.css'
 
 export default function App() {
@@ -66,26 +67,10 @@ export default function App() {
     fetchTopics()
   }, [selectedId])
 
-  const selected = dates.find(d => d.id === selectedId)
-  const dateLabel = selected
-    ? `${new Date(selected.date).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' })} ${selected.period}`
-    : ''
-
   return (
     <div className="app">
       <header className="header">
-        <h1 className="date-title">{dateLabel || '뉴스 요약'}</h1>
-        <div className="date-tabs">
-          {dates.map(d => (
-            <button
-              key={d.id}
-              className={`tab ${d.id === selectedId ? 'tab--active' : ''}`}
-              onClick={() => setSelectedId(d.id)}
-            >
-              {new Date(d.date).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' })} {d.period}
-            </button>
-          ))}
-        </div>
+        <DatePicker dates={dates} selectedId={selectedId} onSelect={setSelectedId} />
       </header>
 
       <main className="main">
