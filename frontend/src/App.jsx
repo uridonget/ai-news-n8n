@@ -15,7 +15,7 @@ export default function App() {
         .from('dates')
         .select('id, date, period')
         .order('date', { ascending: false })
-        .order('period', { ascending: true })
+        .order('period', { ascending: false })
         .limit(10)
 
       if (data?.length) {
