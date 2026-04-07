@@ -6,8 +6,8 @@
       "parameters": {
         "rule": {
           "interval": [
-            { "field": "cronExpression", "expression": "0 22 * * *" },
-            { "field": "cronExpression", "expression": "0 9 * * *" }
+            { "field": "cronExpression", "expression": "0 7 * * *" },
+            { "field": "cronExpression", "expression": "0 18 * * *" }
           ]
         }
       },
