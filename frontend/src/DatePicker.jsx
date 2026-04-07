@@ -14,7 +14,9 @@ export default function DatePicker({ dates, selectedId, onSelect }) {
     onSelect((same || fallback).id)
   }
 
-  const periodsForDate = dates.filter(d => d.date === selected?.date)
+  const periodsForDate = dates
+    .filter(d => d.date === selected?.date)
+    .sort((a, b) => a.period.localeCompare(b.period))  // 오전 → 오후 순 (left → right)
 
   const dateLabel = selected
     ? new Date(selected.date).toLocaleDateString('ko-KR', {
