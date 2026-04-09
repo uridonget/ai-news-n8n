@@ -75,7 +75,10 @@
       },
       "id": "n0000000f-0000-0000-0000-000000000000",
       "name": "Gemini API",
-      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [1880, 900]
+      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [1880, 900],
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 600000
     },
     {
       "parameters": {
@@ -146,6 +149,15 @@
 
     {
       "parameters": {
+        "jsCode": "// 루프 시작 전 누적 버퍼 초기화\nconst staticData = $getWorkflowStaticData('global');\nstaticData.pendingArticles = [];\nstaticData.pendingSummaries = [];\nreturn $input.all();"
+      },
+      "id": "n00000022-0000-0000-0000-000000000000",
+      "name": "누적 초기화",
+      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [3090, 900]
+    },
+
+    {
+      "parameters": {
         "batchSize": 1,
         "options": {}
       },
@@ -153,7 +165,7 @@
       "name": "Loop Over Items",
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 1,
-      "position": [3200, 900]
+      "position": [3300, 900]
     },
     {
       "parameters": {
@@ -177,7 +189,7 @@
       },
       "id": "n00000016-0000-0000-0000-000000000000",
       "name": "Naver 뉴스 검색",
-      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [3420, 1100]
+      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [3520, 1100]
     },
     {
       "parameters": {
@@ -185,7 +197,7 @@
       },
       "id": "n00000017-0000-0000-0000-000000000000",
       "name": "링크 추출",
-      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [3640, 1100]
+      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [3740, 1100]
     },
     {
       "parameters": {
@@ -206,15 +218,86 @@
       },
       "id": "n00000018-0000-0000-0000-000000000000",
       "name": "기사 스크레이핑",
-      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [3860, 1100]
+      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [3960, 1100]
     },
     {
       "parameters": {
-        "jsCode": "const originals = $('링크 추출').all();\n\nreturn $input.all().map((item, i) => {\n  const orig = originals[i]?.json || {};\n  const html = item.json.data || '';\n\n  // article#dic_area 본문 추출\n  const areaMatch = html.match(/id=[\"']dic_area[\"'][^>]*>([\\s\\S]*?)<\\/article>/);\n  let content = '';\n  if (areaMatch) {\n    content = areaMatch[1]\n      .replace(/<script[\\s\\S]*?<\\/script>/gi, '')\n      .replace(/<style[\\s\\S]*?<\\/style>/gi, '')\n      .replace(/<[^>]+>/g, ' ')\n      .replace(/\\s+/g, ' ')\n      .trim()\n      .slice(0, 2000);\n  }\n\n  const published_date = (() => {\n    try { return new Date(orig.pubDate).toLocaleDateString('sv-SE', { timeZone: 'Asia/Seoul' }); }\n    catch(e) { return new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Seoul' }); }\n  })();\n\n  return {\n    json: {\n      topic_id:       orig.topic_id,\n      keyword:        orig.keyword,\n      title:          orig.title,\n      url:            orig.url,\n      publisher:      orig.publisher,\n      published_date,\n      content\n    }\n  };\n});"
+        "jsCode": "const originals = $('링크 추출').all();\n\nreturn $input.all().map((item, i) => {\n  const orig = originals[i]?.json || {};\n  const html = item.json.data || '';\n\n  // article#dic_area 본문 추출\n  const areaMatch = html.match(/id=[\"']dic_area[\"'][^>]*>([\\s\\S]*?)<\\/article>/);\n  let content = '';\n  if (areaMatch) {\n    content = areaMatch[1]\n      .replace(/<script[\\s\\S]*?<\\/script>/gi, '')\n      .replace(/<style[\\s\\S]*?<\\/style>/gi, '')\n      .replace(/<[^>]+>/g, ' ')\n      .replace(/\\s+/g, ' ')\n      .trim()\n      .slice(0, 2000);\n  }\n\n  const published_date = (() => {\n    try { return new Date(orig.pubDate).toLocaleDateString('sv-SE', { timeZone: 'Asia/Seoul' }); }\n    catch(e) { return new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Seoul' }); }\n  })();\n\n  return {\n    json: {\n      topic_id:       orig.topic_id,\n      keyword:        orig.keyword,\n      title:          orig.title,\n      url:            orig.url,\n      published_date,\n      content\n    }\n  };\n});"
       },
       "id": "n00000019-0000-0000-0000-000000000000",
       "name": "본문 추출",
-      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [4080, 1100]
+      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [4180, 1100]
+    },
+    {
+      "parameters": {
+        "jsCode": "const articles = $('본문 추출').all();\nconst topic_id = articles[0]?.json.topic_id;\nconst keyword  = $('Loop Over Items').item.json.keyword;\n\nconst articlesText = articles\n  .map((item, i) => `[기사 ${i + 1}]\\n${item.json.content}`)\n  .filter(t => t.trim().length > 15)\n  .join('\\n\\n');\n\nreturn [{ json: { topic_id, keyword, articles_text: articlesText } }];"
+      },
+      "id": "n0000001c-0000-0000-0000-000000000000",
+      "name": "본문 취합",
+      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [4400, 1100]
+    },
+    {
+      "parameters": {
+        "jsCode": "const { keyword, articles_text, topic_id } = $input.first().json;\n\nconst prompt = [\n  '당신은 전문 뉴스 애널리스트입니다.',\n  `아래는 '${keyword}'와 관련된 기사 본문입니다.`,\n  '',\n  '[기사 묶음]',\n  articles_text,\n  '',\n  '[지시사항]',\n  '1. 모든 기사를 종합해 3~5문장으로 핵심 상황을 요약하세요.',\n  '2. 전문 용어 3~5개를 골라 초등학생도 이해할 수 있게 설명하세요.',\n  '',\n  '[답변 규칙 - 반드시 준수]',\n  '- 아래 형식을 한 글자도 바꾸지 말고 그대로 사용하세요.',\n  '- ### 요약 ### 과 ### 용어 설명 ### 사이에 구분선(--)이나 다른 텍스트를 절대 넣지 마세요.',\n  '- 두 섹션 외의 어떤 머리말, 인사말, 부연 설명도 출력하지 마세요.',\n  '',\n  '[답변 형식]',\n  '### 요약 ###',\n  '(요약 내용만 작성)',\n  '### 용어 설명 ###',\n  '- **용어:** (설명)'\n].join('\\n');\n\nreturn [{\n  json: {\n    topic_id,\n    contents: [{ parts: [{ text: prompt }] }]\n  }\n}];"
+      },
+      "id": "n0000001d-0000-0000-0000-000000000000",
+      "name": "요약 프롬프트 생성",
+      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [4620, 1100]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent?key={{ $env.GEMINI_API_KEY }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { contents: $json.contents } }}",
+        "options": {}
+      },
+      "id": "n0000001e-0000-0000-0000-000000000000",
+      "name": "Gemini 요약 API",
+      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [4840, 1100],
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 600000
+    },
+    {
+      "parameters": {
+        "jsCode": "const text = $input.first().json.candidates[0].content.parts[0].text;\nconst topic_id = $node['요약 프롬프트 생성'].json.topic_id;\n\n// ##, ### 등 다양한 헤딩 형식 허용\nconst summaryMatch = text.match(/#+\\s*요약\\s*#+\\s*\\n([\\s\\S]*?)(?=#+\\s*용어|$)/);\nconst termsMatch   = text.match(/#+\\s*용어\\s*설명?\\s*#+\\s*\\n([\\s\\S]*)$/);\n\nconst summary_text     = summaryMatch ? summaryMatch[1].trim() : text.trim();\nconst term_explanation = termsMatch   ? termsMatch[1].trim()   : '';\n\nreturn [{ json: { topic_id, summary_text, term_explanation } }];"
+      },
+      "id": "n0000001f-0000-0000-0000-000000000000",
+      "name": "요약 파싱",
+      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [5060, 1100]
+    },
+
+    {
+      "parameters": {
+        "jsCode": "// 이번 루프 반복의 articles + summary를 전역 버퍼에 누적\nconst staticData = $getWorkflowStaticData('global');\nif (!staticData.pendingArticles)  staticData.pendingArticles  = [];\nif (!staticData.pendingSummaries) staticData.pendingSummaries = [];\n\nconst { topic_id, summary_text, term_explanation } = $input.first().json;\n\nconst articles = $('본문 추출').all().map(item => ({\n  topic_id:       item.json.topic_id,\n  title:          item.json.title,\n  url:            item.json.url,\n  published_date: item.json.published_date\n}));\n\nstaticData.pendingArticles.push(...articles);\nstaticData.pendingSummaries.push({ topic_id, summary_text, term_explanation });\n\nreturn [{ json: { accumulated: staticData.pendingArticles.length } }];"
+      },
+      "id": "n00000023-0000-0000-0000-000000000000",
+      "name": "데이터 누적",
+      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [5280, 1100]
+    },
+    {
+      "parameters": {
+        "resume": "timeInterval",
+        "amount": 30,
+        "unit": "seconds"
+      },
+      "id": "n00000021-0000-0000-0000-000000000000",
+      "name": "5초 대기",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [5500, 1100],
+      "webhookId": "w00000001-0000-0000-0000-000000000000"
+    },
+
+    {
+      "parameters": {
+        "jsCode": "// 루프 완료 후 누적된 전체 데이터 읽기\nconst staticData = $getWorkflowStaticData('global');\nconst articles  = staticData.pendingArticles  || [];\nconst summaries = staticData.pendingSummaries || [];\nstaticData.pendingArticles  = [];\nstaticData.pendingSummaries = [];\nreturn [{ json: { articles, summaries } }];"
+      },
+      "id": "n00000024-0000-0000-0000-000000000000",
+      "name": "누적 데이터 읽기",
+      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [3520, 700]
     },
     {
       "parameters": {
@@ -230,49 +313,20 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ { topic_id: $json.topic_id, title: $json.title, url: $json.url, published_date: $json.published_date } }}",
+        "jsonBody": "={{ $json.articles }}",
         "options": {}
       },
-      "id": "n0000001b-0000-0000-0000-000000000000",
-      "name": "articles UPSERT",
-      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [4520, 1100]
+      "id": "n00000025-0000-0000-0000-000000000000",
+      "name": "articles 일괄 UPSERT",
+      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [3740, 700]
     },
     {
       "parameters": {
-        "jsCode": "const articles = $('본문 추출').all();\nconst topic_id = articles[0]?.json.topic_id;\nconst keyword  = $('Loop Over Items').item.json.keyword;\n\nconst articlesText = articles\n  .map((item, i) => `[기사 ${i + 1}]\\n${item.json.content}`)\n  .filter(t => t.trim().length > 15)\n  .join('\\n\\n');\n\nreturn [{ json: { topic_id, keyword, articles_text: articlesText } }];"
+        "jsCode": "return [{ json: { summaries: $('누적 데이터 읽기').first().json.summaries } }];"
       },
-      "id": "n0000001c-0000-0000-0000-000000000000",
-      "name": "본문 취합",
-      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [4740, 1100]
-    },
-    {
-      "parameters": {
-        "jsCode": "const { keyword, articles_text, topic_id } = $input.first().json;\n\nconst prompt = [\n  '당신은 전문 뉴스 애널리스트입니다.',\n  `아래는 '${keyword}'와 관련된 기사 본문입니다.`,\n  '',\n  '[기사 묶음]',\n  articles_text,\n  '',\n  '[지시사항]',\n  '1. 모든 기사를 종합해 3~5문장으로 핵심 상황을 요약하세요.',\n  '2. 전문 용어 3~5개를 골라 초등학생도 이해할 수 있게 설명하세요.',\n  '',\n  '[답변 규칙 - 반드시 준수]',\n  '- 아래 형식을 한 글자도 바꾸지 말고 그대로 사용하세요.',\n  '- ### 요약 ### 과 ### 용어 설명 ### 사이에 구분선(--)이나 다른 텍스트를 절대 넣지 마세요.',\n  '- 두 섹션 외의 어떤 머리말, 인사말, 부연 설명도 출력하지 마세요.',\n  '',\n  '[답변 형식]',\n  '### 요약 ###',\n  '(요약 내용만 작성)',\n  '### 용어 설명 ###',\n  '- **용어:** (설명)'\n].join('\\n');\n\nreturn [{\n  json: {\n    topic_id,\n    contents: [{ parts: [{ text: prompt }] }]\n  }\n}];"
-      },
-      "id": "n0000001d-0000-0000-0000-000000000000",
-      "name": "요약 프롬프트 생성",
-      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [4960, 1100]
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "=https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent?key={{ $env.GEMINI_API_KEY }}",
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={{ { contents: $json.contents } }}",
-        "options": {}
-      },
-      "id": "n0000001e-0000-0000-0000-000000000000",
-      "name": "Gemini 요약 API",
-      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [5180, 1100]
-    },
-    {
-      "parameters": {
-        "jsCode": "const text = $input.first().json.candidates[0].content.parts[0].text;\nconst topic_id = $node['요약 프롬프트 생성'].json.topic_id;\n\n// ##, ### 등 다양한 헤딩 형식 허용\nconst summaryMatch = text.match(/#+\\s*요약\\s*#+\\s*\\n([\\s\\S]*?)(?=#+\\s*용어|$)/);\nconst termsMatch   = text.match(/#+\\s*용어\\s*설명?\\s*#+\\s*\\n([\\s\\S]*)$/);\n\nconst summary_text     = summaryMatch ? summaryMatch[1].trim() : text.trim();\nconst term_explanation = termsMatch   ? termsMatch[1].trim()   : '';\n\nreturn [{ json: { topic_id, summary_text, term_explanation } }];"
-      },
-      "id": "n0000001f-0000-0000-0000-000000000000",
-      "name": "요약 파싱",
-      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [5400, 1100]
+      "id": "n00000026-0000-0000-0000-000000000000",
+      "name": "summaries 준비",
+      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [3960, 700]
     },
     {
       "parameters": {
@@ -288,25 +342,12 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ { topic_id: $json.topic_id, summary_text: $json.summary_text, term_explanation: $json.term_explanation } }}",
+        "jsonBody": "={{ $json.summaries }}",
         "options": {}
       },
-      "id": "n00000020-0000-0000-0000-000000000000",
-      "name": "summaries UPSERT",
-      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [5620, 1100]
-    },
-    {
-      "parameters": {
-        "resume": "timeInterval",
-        "amount": 30,
-        "unit": "seconds"
-      },
-      "id": "n00000021-0000-0000-0000-000000000000",
-      "name": "5초 대기",
-      "type": "n8n-nodes-base.wait",
-      "typeVersion": 1,
-      "position": [5840, 1100],
-      "webhookId": "w00000001-0000-0000-0000-000000000000"
+      "id": "n00000027-0000-0000-0000-000000000000",
+      "name": "summaries 일괄 UPSERT",
+      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [4180, 700]
     }
   ],
   "connections": {
@@ -338,24 +379,27 @@
     "dates UPSERT":         { "main": [[{ "node": "topics 생성 준비",     "type": "main", "index": 0 }]] },
     "topics 생성 준비":      { "main": [[{ "node": "Supabase topics 저장", "type": "main", "index": 0 }]] },
     "Supabase topics 저장": { "main": [[{ "node": "응답 정리",            "type": "main", "index": 0 }]] },
-    "응답 정리":             { "main": [[{ "node": "Loop Over Items",      "type": "main", "index": 0 }]] },
+    "응답 정리":             { "main": [[{ "node": "누적 초기화",           "type": "main", "index": 0 }]] },
+    "누적 초기화":           { "main": [[{ "node": "Loop Over Items",      "type": "main", "index": 0 }]] },
     "Loop Over Items": {
       "main": [
-        [{ "node": "Naver 뉴스 검색", "type": "main", "index": 0 }],
-        []
+        [{ "node": "Naver 뉴스 검색",   "type": "main", "index": 0 }],
+        [{ "node": "누적 데이터 읽기",   "type": "main", "index": 0 }]
       ]
     },
-    "Naver 뉴스 검색":  { "main": [[{ "node": "링크 추출",        "type": "main", "index": 0 }]] },
-    "링크 추출":        { "main": [[{ "node": "기사 스크레이핑",   "type": "main", "index": 0 }]] },
-    "기사 스크레이핑":  { "main": [[{ "node": "본문 추출",         "type": "main", "index": 0 }]] },
-    "본문 추출":        { "main": [[{ "node": "articles UPSERT",  "type": "main", "index": 0 }]] },
-    "articles UPSERT": { "main": [[{ "node": "본문 취합",          "type": "main", "index": 0 }]] },
-    "본문 취합":        { "main": [[{ "node": "요약 프롬프트 생성", "type": "main", "index": 0 }]] },
-    "요약 프롬프트 생성": { "main": [[{ "node": "Gemini 요약 API",  "type": "main", "index": 0 }]] },
-    "Gemini 요약 API":  { "main": [[{ "node": "요약 파싱",          "type": "main", "index": 0 }]] },
-    "요약 파싱":        { "main": [[{ "node": "summaries UPSERT",   "type": "main", "index": 0 }]] },
-    "summaries UPSERT": { "main": [[{ "node": "5초 대기",           "type": "main", "index": 0 }]] },
-    "5초 대기":         { "main": [[{ "node": "Loop Over Items",     "type": "main", "index": 0 }]] }
+    "Naver 뉴스 검색":    { "main": [[{ "node": "링크 추출",          "type": "main", "index": 0 }]] },
+    "링크 추출":          { "main": [[{ "node": "기사 스크레이핑",     "type": "main", "index": 0 }]] },
+    "기사 스크레이핑":    { "main": [[{ "node": "본문 추출",           "type": "main", "index": 0 }]] },
+    "본문 추출":          { "main": [[{ "node": "본문 취합",           "type": "main", "index": 0 }]] },
+    "본문 취합":          { "main": [[{ "node": "요약 프롬프트 생성",   "type": "main", "index": 0 }]] },
+    "요약 프롬프트 생성":  { "main": [[{ "node": "Gemini 요약 API",    "type": "main", "index": 0 }]] },
+    "Gemini 요약 API":   { "main": [[{ "node": "요약 파싱",            "type": "main", "index": 0 }]] },
+    "요약 파싱":          { "main": [[{ "node": "데이터 누적",          "type": "main", "index": 0 }]] },
+    "데이터 누적":        { "main": [[{ "node": "5초 대기",             "type": "main", "index": 0 }]] },
+    "5초 대기":           { "main": [[{ "node": "Loop Over Items",     "type": "main", "index": 0 }]] },
+    "누적 데이터 읽기":    { "main": [[{ "node": "articles 일괄 UPSERT", "type": "main", "index": 0 }]] },
+    "articles 일괄 UPSERT": { "main": [[{ "node": "summaries 준비",    "type": "main", "index": 0 }]] },
+    "summaries 준비":    { "main": [[{ "node": "summaries 일괄 UPSERT", "type": "main", "index": 0 }]] }
   },
   "active": true,
   "settings": {}
