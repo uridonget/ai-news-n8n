@@ -58,7 +58,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const allTitles = $input.first().json.all_titles;\n\nconst prompt = [\n  '다음은 오늘 뉴스 헤드라인 제목 목록입니다.',\n  '현재 가장 중요하고 관심을 가질 만한 검색 키워드 10개를 선정해주세요.',\n  'IT에 관심이 많고 세계, 사회 순서로 관심이 있습니다.',\n  '유사하거나 중복 의미의 키워드는 최소화하세요.',\n  '서두나 부연 설명 없이 키워드 10개만 쉼표(,)로 구분해 한 줄로만 답변하세요.',\n  '',\n  '[답변 예시]',\n  'A, B, C, D, E, F, G, H, I, J',\n  '',\n  '[제목 목록]',\n  allTitles\n].join('\\n');\n\nreturn [{\n  json: {\n    contents: [{\n      parts: [{ text: prompt }]\n    }]\n  }\n}];"
+        "jsCode": "const allTitles = $input.first().json.all_titles;\n\nconst prompt = [\n  '다음은 오늘 뉴스 헤드라인 제목 목록입니다.',\n  '현재 가장 중요하고 관심을 가질 만한 검색 키워드 20개를 선정해주세요.',\n  'IT에 관심이 많고 세계, 사회 순서로 관심이 있습니다.',\n  '유사하거나 중복 의미의 키워드는 최소화하세요.',\n  '서두나 부연 설명 없이 키워드 20개만 쉼표(,)로 구분해 한 줄로만 답변하세요.',\n  '',\n  '[답변 예시]',\n  'A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T',\n  '',\n  '[제목 목록]',\n  allTitles\n].join('\\n');\n\nreturn [{\n  json: {\n    contents: [{\n      parts: [{ text: prompt }]\n    }]\n  }\n}];"
       },
       "id": "n0000000e-0000-0000-0000-000000000000",
       "name": "프롬프트 생성",
@@ -149,6 +149,15 @@
 
     {
       "parameters": {
+        "jsCode": "// 루프 시작 전 성공한 summary 카운트 초기화\nconst staticData = $getWorkflowStaticData('global');\nstaticData.summaryCount = 0;\nreturn $input.all();"
+      },
+      "id": "n00000023-0000-0000-0000-000000000000",
+      "name": "카운트 초기화",
+      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [3090, 900]
+    },
+
+    {
+      "parameters": {
         "batchSize": 1,
         "options": {}
       },
@@ -156,7 +165,7 @@
       "name": "Loop Over Items",
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 1,
-      "position": [3200, 900]
+      "position": [3300, 900]
     },
     {
       "parameters": {
@@ -180,7 +189,7 @@
       },
       "id": "n00000016-0000-0000-0000-000000000000",
       "name": "Naver 뉴스 검색",
-      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [3420, 1100]
+      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [3520, 1100]
     },
     {
       "parameters": {
@@ -188,7 +197,7 @@
       },
       "id": "n00000017-0000-0000-0000-000000000000",
       "name": "링크 추출",
-      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [3640, 1100]
+      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [3740, 1100]
     },
     {
       "parameters": {
@@ -205,7 +214,7 @@
       "name": "스킵 체크",
       "type": "n8n-nodes-base.if",
       "typeVersion": 1,
-      "position": [3860, 1100]
+      "position": [3960, 1100]
     },
     {
       "parameters": {
@@ -226,7 +235,7 @@
       },
       "id": "n00000018-0000-0000-0000-000000000000",
       "name": "기사 스크레이핑",
-      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [3860, 1100]
+      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [4180, 1100]
     },
     {
       "parameters": {
@@ -234,7 +243,7 @@
       },
       "id": "n00000019-0000-0000-0000-000000000000",
       "name": "본문 추출",
-      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [4080, 1100]
+      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [4400, 1100]
     },
     {
       "parameters": {
@@ -255,7 +264,7 @@
       },
       "id": "n0000001b-0000-0000-0000-000000000000",
       "name": "articles UPSERT",
-      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [4300, 1100]
+      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [4620, 1100]
     },
     {
       "parameters": {
@@ -263,7 +272,7 @@
       },
       "id": "n0000001c-0000-0000-0000-000000000000",
       "name": "본문 취합",
-      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [4520, 1100]
+      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [4840, 1100]
     },
     {
       "parameters": {
@@ -271,7 +280,7 @@
       },
       "id": "n0000001d-0000-0000-0000-000000000000",
       "name": "요약 프롬프트 생성",
-      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [4740, 1100]
+      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [5060, 1100]
     },
     {
       "parameters": {
@@ -284,7 +293,7 @@
       },
       "id": "n0000001e-0000-0000-0000-000000000000",
       "name": "Gemini 요약 API",
-      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [4960, 1100],
+      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [5280, 1100],
       "retryOnFail": true,
       "maxTries": 5,
       "waitBetweenTries": 600000
@@ -295,7 +304,7 @@
       },
       "id": "n0000001f-0000-0000-0000-000000000000",
       "name": "요약 파싱",
-      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [5180, 1100]
+      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [5500, 1100]
     },
     {
       "parameters": {
@@ -316,7 +325,32 @@
       },
       "id": "n00000020-0000-0000-0000-000000000000",
       "name": "summaries UPSERT",
-      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [5400, 1100]
+      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [5720, 1100]
+    },
+    {
+      "parameters": {
+        "jsCode": "// summary 성공 카운트 증가 후 10개 달성 여부 확인\nconst staticData = $getWorkflowStaticData('global');\nif (!staticData.summaryCount) staticData.summaryCount = 0;\nstaticData.summaryCount++;\nconst done = staticData.summaryCount >= 10;\nreturn [{ json: { done, count: staticData.summaryCount } }];"
+      },
+      "id": "n00000024-0000-0000-0000-000000000000",
+      "name": "요약 카운트",
+      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [5940, 1100]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.done }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "n00000025-0000-0000-0000-000000000000",
+      "name": "완료 체크",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [6160, 1100]
     },
     {
       "parameters": {
@@ -328,7 +362,7 @@
       "name": "5초 대기",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1,
-      "position": [5620, 1100],
+      "position": [6380, 1100],
       "webhookId": "w00000001-0000-0000-0000-000000000000"
     }
   ],
@@ -361,25 +395,38 @@
     "dates UPSERT":         { "main": [[{ "node": "topics 생성 준비",     "type": "main", "index": 0 }]] },
     "topics 생성 준비":      { "main": [[{ "node": "Supabase topics 저장", "type": "main", "index": 0 }]] },
     "Supabase topics 저장": { "main": [[{ "node": "응답 정리",            "type": "main", "index": 0 }]] },
-    "응답 정리":             { "main": [[{ "node": "Loop Over Items",      "type": "main", "index": 0 }]] },
+    "응답 정리":             { "main": [[{ "node": "카운트 초기화",         "type": "main", "index": 0 }]] },
+    "카운트 초기화":          { "main": [[{ "node": "Loop Over Items",      "type": "main", "index": 0 }]] },
     "Loop Over Items": {
       "main": [
         [{ "node": "Naver 뉴스 검색", "type": "main", "index": 0 }],
         []
       ]
     },
-    "Naver 뉴스 검색":  { "main": [[{ "node": "링크 추출",          "type": "main", "index": 0 }]] },
-    "링크 추출":        { "main": [[{ "node": "스킵 체크",           "type": "main", "index": 0 }]] },
-    "스킵 체크":        { "main": [[{ "node": "5초 대기",            "type": "main", "index": 0 }], [{ "node": "기사 스크레이핑", "type": "main", "index": 0 }]] },
-    "기사 스크레이핑":  { "main": [[{ "node": "본문 추출",           "type": "main", "index": 0 }]] },
+    "Naver 뉴스 검색": { "main": [[{ "node": "링크 추출",       "type": "main", "index": 0 }]] },
+    "링크 추출":       { "main": [[{ "node": "스킵 체크",        "type": "main", "index": 0 }]] },
+    "스킵 체크": {
+      "main": [
+        [{ "node": "5초 대기",       "type": "main", "index": 0 }],
+        [{ "node": "기사 스크레이핑", "type": "main", "index": 0 }]
+      ]
+    },
+    "기사 스크레이핑":   { "main": [[{ "node": "본문 추출",          "type": "main", "index": 0 }]] },
     "본문 추출":        { "main": [[{ "node": "articles UPSERT",    "type": "main", "index": 0 }]] },
     "articles UPSERT": { "main": [[{ "node": "본문 취합",           "type": "main", "index": 0 }]] },
     "본문 취합":        { "main": [[{ "node": "요약 프롬프트 생성",   "type": "main", "index": 0 }]] },
     "요약 프롬프트 생성": { "main": [[{ "node": "Gemini 요약 API",   "type": "main", "index": 0 }]] },
     "Gemini 요약 API":  { "main": [[{ "node": "요약 파싱",           "type": "main", "index": 0 }]] },
     "요약 파싱":        { "main": [[{ "node": "summaries UPSERT",   "type": "main", "index": 0 }]] },
-    "summaries UPSERT": { "main": [[{ "node": "5초 대기",           "type": "main", "index": 0 }]] },
-    "5초 대기":         { "main": [[{ "node": "Loop Over Items",    "type": "main", "index": 0 }]] }
+    "summaries UPSERT": { "main": [[{ "node": "요약 카운트",         "type": "main", "index": 0 }]] },
+    "요약 카운트":      { "main": [[{ "node": "완료 체크",           "type": "main", "index": 0 }]] },
+    "완료 체크": {
+      "main": [
+        [],
+        [{ "node": "5초 대기", "type": "main", "index": 0 }]
+      ]
+    },
+    "5초 대기": { "main": [[{ "node": "Loop Over Items", "type": "main", "index": 0 }]] }
   },
   "active": true,
   "settings": {}
