@@ -184,11 +184,28 @@
     },
     {
       "parameters": {
-        "jsCode": "const topic_id = $('Loop Over Items').item.json.topic_id;\nconst keyword  = $('Loop Over Items').item.json.keyword;\nconst allItems = $input.first().json.items || [];\n\nconst decodeEntities = s => s\n  .replace(/&quot;/g, '\"')\n  .replace(/&amp;/g, '&')\n  .replace(/&lt;/g, '<')\n  .replace(/&gt;/g, '>')\n  .replace(/&#39;/g, \"'\")\n  .replace(/&apos;/g, \"'\");\n\nconst naverItems = allItems.filter(i => i.link?.includes('n.news.naver.com'));\n\nreturn naverItems.map(item => ({\n  json: {\n    topic_id,\n    keyword,\n    title:   decodeEntities(item.title.replace(/<[^>]+>/g, '').trim()),\n    url:     item.link,\n    pubDate: item.pubDate\n  }\n}));"
+        "jsCode": "const topic_id = $('Loop Over Items').item.json.topic_id;\nconst keyword  = $('Loop Over Items').item.json.keyword;\nconst allItems = $input.first().json.items || [];\n\nconst decodeEntities = s => s\n  .replace(/&quot;/g, '\"')\n  .replace(/&amp;/g, '&')\n  .replace(/&lt;/g, '<')\n  .replace(/&gt;/g, '>')\n  .replace(/&#39;/g, \"'\")\n  .replace(/&apos;/g, \"'\");\n\nconst naverItems = allItems.filter(i => i.link?.includes('n.news.naver.com'));\n\nif (naverItems.length === 0) {\n  return [{ json: { skip: true, topic_id, keyword } }];\n}\n\nreturn naverItems.map(item => ({\n  json: {\n    skip: false,\n    topic_id,\n    keyword,\n    title:   decodeEntities(item.title.replace(/<[^>]+>/g, '').trim()),\n    url:     item.link,\n    pubDate: item.pubDate\n  }\n}));"
       },
       "id": "n00000017-0000-0000-0000-000000000000",
       "name": "링크 추출",
       "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [3640, 1100]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.skip }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "n00000022-0000-0000-0000-000000000000",
+      "name": "스킵 체크",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [3860, 1100]
     },
     {
       "parameters": {
@@ -250,7 +267,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const { keyword, articles_text, topic_id } = $input.first().json;\n\nconst prompt = [\n  '당신은 전문 뉴스 애널리스트입니다.',\n  `아래는 '${keyword}'와 관련된 기사 본문입니다.`,\n  '',\n  '[기사 묶음]',\n  articles_text,\n  '',\n  '[지시사항]',\n  '1. 모든 기사를 종합해 3~5문장으로 핵심 상황을 요약하세요.',\n  '2. 전문 용어 3~5개를 골라 초등학생도 이해할 수 있게 설명하세요.',\n  '',\n  '[답변 규칙 - 반드시 준수]',\n  '- 아래 형식을 한 글자도 바꾸지 말고 그대로 사용하세요.',\n  '- ### 요약 ### 과 ### 용어 설명 ### 사이에 구분선(--)이나 다른 텍스트를 절대 넣지 마세요.',\n  '- 두 섹션 외의 어떤 머리말, 인사말, 부연 설명도 출력하지 마세요.',\n  '',\n  '[답변 형식]',\n  '### 요약 ###',\n  '(요약 내용만 작성)',\n  '### 용어 설명 ###',\n  '- **용어:** (설명)'\n].join('\\n');\n\nreturn [{\n  json: {\n    topic_id,\n    contents: [{ parts: [{ text: prompt }] }]\n  }\n}];"
+        "jsCode": "const { keyword, articles_text, topic_id } = $input.first().json;\n\nconst prompt = [\n  '당신은 전문 뉴스 애널리스트입니다.',\n  `아래는 '${keyword}'와 관련된 기사 본문입니다.`,\n  '',\n  '[기사 묶음]',\n  articles_text,\n  '',\n  '[작성 순서]',\n  '① 먼저 설명할 전문 용어 3~5개를 선정하세요.',\n  '② 요약문을 작성할 때, 선정한 용어를 선정 시 결정한 표현 그대로 사용하세요.',\n  '③ 용어 설명 섹션에서는 ②에서 실제로 사용한 표현을 그대로 용어명으로 씁니다.',\n  '',\n  '[답변 규칙 - 반드시 준수]',\n  '- 아래 형식을 한 글자도 바꾸지 말고 그대로 사용하세요.',\n  '- ### 요약 ### 과 ### 용어 설명 ### 사이에 구분선(--)이나 다른 텍스트를 절대 넣지 마세요.',\n  '- 두 섹션 외의 어떤 머리말, 인사말, 부연 설명도 출력하지 마세요.',\n  '- 용어 설명의 용어명은 요약문에 등장하는 표현과 완전히 동일해야 합니다.',\n  '',\n  '[답변 형식]',\n  '### 요약 ###',\n  '(요약 내용만 작성, 3~5문장)',\n  '### 용어 설명 ###',\n  '- **용어명(요약에 쓰인 표현 그대로):** (초등학생도 이해할 수 있는 설명)'\n].join('\\n');\n\nreturn [{\n  json: {\n    topic_id,\n    contents: [{ parts: [{ text: prompt }] }]\n  }\n}];"
       },
       "id": "n0000001d-0000-0000-0000-000000000000",
       "name": "요약 프롬프트 생성",
@@ -352,7 +369,8 @@
       ]
     },
     "Naver 뉴스 검색":  { "main": [[{ "node": "링크 추출",          "type": "main", "index": 0 }]] },
-    "링크 추출":        { "main": [[{ "node": "기사 스크레이핑",     "type": "main", "index": 0 }]] },
+    "링크 추출":        { "main": [[{ "node": "스킵 체크",           "type": "main", "index": 0 }]] },
+    "스킵 체크":        { "main": [[{ "node": "5초 대기",            "type": "main", "index": 0 }], [{ "node": "기사 스크레이핑", "type": "main", "index": 0 }]] },
     "기사 스크레이핑":  { "main": [[{ "node": "본문 추출",           "type": "main", "index": 0 }]] },
     "본문 추출":        { "main": [[{ "node": "articles UPSERT",    "type": "main", "index": 0 }]] },
     "articles UPSERT": { "main": [[{ "node": "본문 취합",           "type": "main", "index": 0 }]] },
