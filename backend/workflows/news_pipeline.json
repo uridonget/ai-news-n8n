@@ -140,7 +140,7 @@
     },
     {
       "parameters": {
-        "jsCode": "return $input.all().map(item => {\n  const row = Array.isArray(item.json) ? item.json[0] : item.json;\n  return {\n    json: {\n      topic_id: row.id,\n      keyword:  row.topic_text,\n      period:   $node['준비'].json.period\n    }\n  };\n});"
+        "jsCode": "return $input.all().map(item => ({\n  json: {\n    date_id: item.json.date_id,\n    keyword: item.json.keyword,\n    period:  item.json.period\n  }\n}));"
       },
       "id": "n00000014-0000-0000-0000-000000000000",
       "name": "응답 정리",
@@ -193,7 +193,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const topic_id = $('Loop Over Items').item.json.topic_id;\nconst keyword  = $('Loop Over Items').item.json.keyword;\nconst allItems = $input.first().json.items || [];\n\nconst decodeEntities = s => s\n  .replace(/&quot;/g, '\"')\n  .replace(/&amp;/g, '&')\n  .replace(/&lt;/g, '<')\n  .replace(/&gt;/g, '>')\n  .replace(/&#39;/g, \"'\")\n  .replace(/&apos;/g, \"'\");\n\nconst naverItems = allItems.filter(i => i.link?.includes('n.news.naver.com'));\n\nif (naverItems.length === 0) {\n  return [{ json: { skip: true, topic_id, keyword } }];\n}\n\nreturn naverItems.map(item => ({\n  json: {\n    skip: false,\n    topic_id,\n    keyword,\n    title:   decodeEntities(item.title.replace(/<[^>]+>/g, '').trim()),\n    url:     item.link,\n    pubDate: item.pubDate\n  }\n}));"
+        "jsCode": "const keyword  = $('Loop Over Items').item.json.keyword;\nconst allItems = $input.first().json.items || [];\n\nconst decodeEntities = s => s\n  .replace(/&quot;/g, '\"')\n  .replace(/&amp;/g, '&')\n  .replace(/&lt;/g, '<')\n  .replace(/&gt;/g, '>')\n  .replace(/&#39;/g, \"'\")\n  .replace(/&apos;/g, \"'\");\n\nconst naverItems = allItems.filter(i => i.link?.includes('n.news.naver.com'));\n\nif (naverItems.length === 0) {\n  return [{ json: { skip: true, keyword } }];\n}\n\nreturn naverItems.map(item => ({\n  json: {\n    skip: false,\n    keyword,\n    title:   decodeEntities(item.title.replace(/<[^>]+>/g, '').trim()),\n    url:     item.link,\n    pubDate: item.pubDate\n  }\n}));"
       },
       "id": "n00000017-0000-0000-0000-000000000000",
       "name": "링크 추출",
@@ -239,7 +239,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const originals = $('링크 추출').all();\n\nreturn $input.all().map((item, i) => {\n  const orig = originals[i]?.json || {};\n  const html = item.json.data || '';\n\n  const areaMatch = html.match(/id=[\"']dic_area[\"'][^>]*>([\\s\\S]*?)<\\/article>/);\n  let content = '';\n  if (areaMatch) {\n    content = areaMatch[1]\n      .replace(/<script[\\s\\S]*?<\\/script>/gi, '')\n      .replace(/<style[\\s\\S]*?<\\/style>/gi, '')\n      .replace(/<[^>]+>/g, ' ')\n      .replace(/\\s+/g, ' ')\n      .trim()\n      .slice(0, 2000);\n  }\n\n  const published_date = (() => {\n    try { return new Date(orig.pubDate).toLocaleDateString('sv-SE', { timeZone: 'Asia/Seoul' }); }\n    catch(e) { return new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Seoul' }); }\n  })();\n\n  return {\n    json: {\n      topic_id:       orig.topic_id,\n      keyword:        orig.keyword,\n      title:          orig.title,\n      url:            orig.url,\n      published_date,\n      content\n    }\n  };\n});"
+        "jsCode": "const originals = $('링크 추출').all();\n\nreturn $input.all().map((item, i) => {\n  const orig = originals[i]?.json || {};\n  const html = item.json.data || '';\n\n  const areaMatch = html.match(/id=[\"']dic_area[\"'][^>]*>([\\s\\S]*?)<\\/article>/);\n  let content = '';\n  if (areaMatch) {\n    content = areaMatch[1]\n      .replace(/<script[\\s\\S]*?<\\/script>/gi, '')\n      .replace(/<style[\\s\\S]*?<\\/style>/gi, '')\n      .replace(/<[^>]+>/g, ' ')\n      .replace(/\\s+/g, ' ')\n      .trim()\n      .slice(0, 2000);\n  }\n\n  const published_date = (() => {\n    try { return new Date(orig.pubDate).toLocaleDateString('sv-SE', { timeZone: 'Asia/Seoul' }); }\n    catch(e) { return new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Seoul' }); }\n  })();\n\n  return {\n    json: {\n      keyword:        orig.keyword,\n      title:          orig.title,\n      url:            orig.url,\n      published_date,\n      content\n    }\n  };\n});"
       },
       "id": "n00000019-0000-0000-0000-000000000000",
       "name": "본문 추출",
@@ -268,7 +268,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const articles = $('본문 추출').all();\nconst topic_id = articles[0]?.json.topic_id;\nconst keyword  = $('Loop Over Items').item.json.keyword;\n\nconst articlesText = articles\n  .map((item, i) => `[기사 ${i + 1}]\\n${item.json.content}`)\n  .filter(t => t.trim().length > 15)\n  .join('\\n\\n');\n\nreturn [{ json: { topic_id, keyword, articles_text: articlesText } }];"
+        "jsCode": "const articles = $('본문 추출').all();\nconst keyword  = $('Loop Over Items').item.json.keyword;\n\nconst articlesText = articles\n  .map((item, i) => `[기사 ${i + 1}]\\n${item.json.content}`)\n  .filter(t => t.trim().length > 15)\n  .join('\\n\\n');\n\nreturn [{ json: { keyword, articles_text: articlesText } }];"
       },
       "id": "n0000001c-0000-0000-0000-000000000000",
       "name": "본문 취합",
@@ -276,7 +276,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const { keyword, articles_text, topic_id } = $input.first().json;\n\nconst prompt = [\n  '당신은 전문 뉴스 애널리스트입니다.',\n  `아래는 '${keyword}'와 관련된 기사 본문입니다.`,\n  '',\n  '[기사 묶음]',\n  articles_text,\n  '',\n  '[작성 순서]',\n  '① 먼저 설명할 전문 용어 3~5개를 선정하세요.',\n  '② 요약문을 작성할 때, 선정한 용어를 선정 시 결정한 표현 그대로 사용하세요.',\n  '③ 용어 설명 섹션에서는 ②에서 실제로 사용한 표현을 그대로 용어명으로 씁니다.',\n  '',\n  '[답변 규칙 - 반드시 준수]',\n  '- 아래 형식을 한 글자도 바꾸지 말고 그대로 사용하세요.',\n  '- ### 요약 ### 과 ### 용어 설명 ### 사이에 구분선(--)이나 다른 텍스트를 절대 넣지 마세요.',\n  '- 두 섹션 외의 어떤 머리말, 인사말, 부연 설명도 출력하지 마세요.',\n  '- 용어 설명의 용어명은 요약문에 등장하는 표현과 완전히 동일해야 합니다.',\n  '- 용어명에 괄호를 절대 사용하지 마세요. 영어 병기도 금지입니다. 예) **테이프 아웃:** 설명 (O) / **테이프 아웃(Tape-out):** 설명 (X) / **TC 본더(TC 본더):** 설명 (X)',\n  '',\n  '[답변 형식]',\n  '### 요약 ###',\n  '(요약 내용만 작성, 3~5문장)',\n  '### 용어 설명 ###',\n  '- **용어명:** 설명'\n].join('\\n');\n\nreturn [{\n  json: {\n    topic_id,\n    contents: [{ parts: [{ text: prompt }] }]\n  }\n}];"
+        "jsCode": "const { keyword, articles_text } = $input.first().json;\n\nconst prompt = [\n  '당신은 전문 뉴스 애널리스트입니다.',\n  `아래는 '${keyword}'와 관련된 기사 본문입니다.`,\n  '',\n  '[기사 묶음]',\n  articles_text,\n  '',\n  '[작성 순서]',\n  '① 먼저 설명할 전문 용어 3~5개를 선정하세요.',\n  '② 요약문을 작성할 때, 선정한 용어를 선정 시 결정한 표현 그대로 사용하세요.',\n  '③ 용어 설명 섹션에서는 ②에서 실제로 사용한 표현을 그대로 용어명으로 씁니다.',\n  '',\n  '[답변 규칙 - 반드시 준수]',\n  '- 아래 형식을 한 글자도 바꾸지 말고 그대로 사용하세요.',\n  '- ### 요약 ### 과 ### 용어 설명 ### 사이에 구분선(--)이나 다른 텍스트를 절대 넣지 마세요.',\n  '- 두 섹션 외의 어떤 머리말, 인사말, 부연 설명도 출력하지 마세요.',\n  '- 용어 설명의 용어명은 요약문에 등장하는 표현과 완전히 동일해야 합니다.',\n  '- 용어명에 괄호를 절대 사용하지 마세요. 영어 병기도 금지입니다. 예) **테이프 아웃:** 설명 (O) / **테이프 아웃(Tape-out):** 설명 (X) / **TC 본더(TC 본더):** 설명 (X)',\n  '',\n  '[답변 형식]',\n  '### 요약 ###',\n  '(요약 내용만 작성, 3~5문장)',\n  '### 용어 설명 ###',\n  '- **용어명:** 설명'\n].join('\\n');\n\nreturn [{\n  json: {\n    contents: [{ parts: [{ text: prompt }] }]\n  }\n}];"
       },
       "id": "n0000001d-0000-0000-0000-000000000000",
       "name": "요약 프롬프트 생성",
@@ -300,7 +300,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const text = $input.first().json.candidates[0].content.parts[0].text;\nconst topic_id = $node['요약 프롬프트 생성'].json.topic_id;\n\nconst summaryMatch = text.match(/#+\\s*요약\\s*#+\\s*\\n([\\s\\S]*?)(?=#+\\s*용어|$)/);\nconst termsMatch   = text.match(/#+\\s*용어\\s*설명?\\s*#+\\s*\\n([\\s\\S]*)$/);\n\nconst summary_text     = summaryMatch ? summaryMatch[1].trim() : text.trim();\nconst term_explanation = termsMatch   ? termsMatch[1].trim()   : '';\n\nreturn [{ json: { topic_id, summary_text, term_explanation } }];"
+        "jsCode": "const text = $input.first().json.candidates[0].content.parts[0].text;\n\nconst summaryMatch = text.match(/#+\\s*요약\\s*#+\\s*\\n([\\s\\S]*?)(?=#+\\s*용어|$)/);\nconst termsMatch   = text.match(/#+\\s*용어\\s*설명?\\s*#+\\s*\\n([\\s\\S]*)$/);\n\nconst summary_text     = summaryMatch ? summaryMatch[1].trim() : text.trim();\nconst term_explanation = termsMatch   ? termsMatch[1].trim()   : '';\n\nreturn [{ json: { summary_text, term_explanation } }];"
       },
       "id": "n0000001f-0000-0000-0000-000000000000",
       "name": "요약 파싱",
@@ -325,7 +325,57 @@
       },
       "id": "n00000020-0000-0000-0000-000000000000",
       "name": "summaries UPSERT",
+      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [6380, 1100]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SUPABASE_URL + '/rest/v1/topics' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey",        "value": "={{ $env.SUPABASE_SERVICE_ROLE_KEY }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $env.SUPABASE_SERVICE_ROLE_KEY }}" },
+            { "name": "Prefer",        "value": "return=representation" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { date_id: $('Loop Over Items').item.json.date_id, topic_text: $('Loop Over Items').item.json.keyword } }}",
+        "options": {}
+      },
+      "id": "n00000026-0000-0000-0000-000000000000",
+      "name": "topic 저장",
       "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [5720, 1100]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SUPABASE_URL + '/rest/v1/articles?on_conflict=url' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey",        "value": "={{ $env.SUPABASE_SERVICE_ROLE_KEY }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $env.SUPABASE_SERVICE_ROLE_KEY }}" },
+            { "name": "Prefer",        "value": "resolution=merge-duplicates,return=representation" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $('본문 추출').all().map(a => ({ topic_id: (Array.isArray($input.first().json) ? $input.first().json[0].id : $input.first().json.id), title: a.json.title, url: a.json.url, published_date: a.json.published_date })) }}",
+        "options": {}
+      },
+      "id": "n00000027-0000-0000-0000-000000000000",
+      "name": "articles 배치 저장",
+      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [5940, 1100]
+    },
+    {
+      "parameters": {
+        "jsCode": "const topicRow = $('topic 저장').first().json;\nconst topic_id = Array.isArray(topicRow) ? topicRow[0].id : topicRow.id;\nconst { summary_text, term_explanation } = $('요약 파싱').first().json;\nreturn [{ json: { topic_id, summary_text, term_explanation } }];"
+      },
+      "id": "n00000028-0000-0000-0000-000000000000",
+      "name": "summary 준비",
+      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [6160, 1100]
     },
     {
       "parameters": {
@@ -333,7 +383,7 @@
       },
       "id": "n00000024-0000-0000-0000-000000000000",
       "name": "요약 카운트",
-      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [5940, 1100]
+      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [6600, 1100]
     },
     {
       "parameters": {
@@ -350,7 +400,7 @@
       "name": "완료 체크",
       "type": "n8n-nodes-base.if",
       "typeVersion": 1,
-      "position": [6160, 1100]
+      "position": [6820, 1100]
     },
     {
       "parameters": {
@@ -362,7 +412,7 @@
       "name": "5초 대기",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1,
-      "position": [6380, 1100],
+      "position": [7040, 1100],
       "webhookId": "w00000001-0000-0000-0000-000000000000"
     }
   ],
@@ -393,8 +443,7 @@
     "Gemini API":           { "main": [[{ "node": "준비",                 "type": "main", "index": 0 }]] },
     "준비":                 { "main": [[{ "node": "dates UPSERT",         "type": "main", "index": 0 }]] },
     "dates UPSERT":         { "main": [[{ "node": "topics 생성 준비",     "type": "main", "index": 0 }]] },
-    "topics 생성 준비":      { "main": [[{ "node": "Supabase topics 저장", "type": "main", "index": 0 }]] },
-    "Supabase topics 저장": { "main": [[{ "node": "응답 정리",            "type": "main", "index": 0 }]] },
+    "topics 생성 준비":      { "main": [[{ "node": "응답 정리",            "type": "main", "index": 0 }]] },
     "응답 정리":             { "main": [[{ "node": "카운트 초기화",         "type": "main", "index": 0 }]] },
     "카운트 초기화":          { "main": [[{ "node": "Loop Over Items",      "type": "main", "index": 0 }]] },
     "Loop Over Items": {
@@ -412,13 +461,15 @@
       ]
     },
     "기사 스크레이핑":   { "main": [[{ "node": "본문 추출",          "type": "main", "index": 0 }]] },
-    "본문 추출":        { "main": [[{ "node": "articles UPSERT",    "type": "main", "index": 0 }]] },
-    "articles UPSERT": { "main": [[{ "node": "본문 취합",           "type": "main", "index": 0 }]] },
+    "본문 추출":        { "main": [[{ "node": "본문 취합",           "type": "main", "index": 0 }]] },
     "본문 취합":        { "main": [[{ "node": "요약 프롬프트 생성",   "type": "main", "index": 0 }]] },
     "요약 프롬프트 생성": { "main": [[{ "node": "Gemini 요약 API",   "type": "main", "index": 0 }]] },
     "Gemini 요약 API":  { "main": [[{ "node": "요약 파싱",           "type": "main", "index": 0 }]] },
-    "요약 파싱":        { "main": [[{ "node": "summaries UPSERT",   "type": "main", "index": 0 }]] },
-    "summaries UPSERT": { "main": [[{ "node": "요약 카운트",         "type": "main", "index": 0 }]] },
+    "요약 파싱":           { "main": [[{ "node": "topic 저장",          "type": "main", "index": 0 }]] },
+    "topic 저장":          { "main": [[{ "node": "articles 배치 저장", "type": "main", "index": 0 }]] },
+    "articles 배치 저장":  { "main": [[{ "node": "summary 준비",        "type": "main", "index": 0 }]] },
+    "summary 준비":        { "main": [[{ "node": "summaries UPSERT",   "type": "main", "index": 0 }]] },
+    "summaries UPSERT":    { "main": [[{ "node": "요약 카운트",         "type": "main", "index": 0 }]] },
     "요약 카운트":      { "main": [[{ "node": "완료 체크",           "type": "main", "index": 0 }]] },
     "완료 체크": {
       "main": [
