@@ -17,7 +17,7 @@ function parseTerms(text) {
   const regex = /\*\*([^*:]+):?\*\*:?\s*(.+)/g
   let match
   while ((match = regex.exec(text)) !== null) {
-    const term = match[1].replace(/:$/, '').trim()
+    const term = match[1].replace(/\([^)]*\)/g, '').replace(/:$/, '').trim()
     const def = match[2].trim()
     if (term && def) terms[term] = def
   }
