@@ -542,7 +542,7 @@
           "fieldValues": [
             {
               "fieldId": "topic_id",
-              "fieldValue": "={{ $json.topic_id }}"
+              "fieldValue": "={{ $('topic 저장').item.json.id }}"
             },
             {
               "fieldId": "summary_text",
@@ -909,11 +909,6 @@
             "node": "20초 대기",
             "type": "main",
             "index": 0
-          },
-          {
-            "node": "topics 생성 준비",
-            "type": "main",
-            "index": 0
           }
         ],
         [
@@ -1108,7 +1103,7 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "dc695d7c-6444-43fe-b67e-0d306b34e717",
+  "versionId": "bd15c7e8-e812-4492-bdac-131ea46b60d9",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "d7602ed70a080880ee2bf6d08ea0692f805408af647865f14f7c63b06bfa917e"
