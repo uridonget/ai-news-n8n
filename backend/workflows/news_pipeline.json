@@ -1,92 +1,220 @@
 {
-  "id": "f0000001-0000-0000-0000-000000000000",
-  "name": "뉴스 파이프라인",
+  "name": "news pipeline",
   "nodes": [
     {
       "parameters": {
         "rule": {
           "interval": [
-            { "field": "cronExpression", "expression": "0 7 * * *" },
-            { "field": "cronExpression", "expression": "0 18 * * *" }
+            {
+              "field": "cronExpression",
+              "expression": "0 7 * * *"
+            },
+            {
+              "field": "cronExpression",
+              "expression": "0 18 * * *"
+            }
           ]
         }
       },
-      "id": "n00000001-0000-0000-0000-000000000000",
+      "id": "2f65ffc6-53ad-48f8-9ef1-6ea0d3295b1e",
       "name": "스케줄 트리거",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
-      "position": [0, 500]
+      "position": [
+        -432,
+        608
+      ]
     },
-
-    { "parameters": { "url": "https://www.yonhapnewstv.co.kr/browse/feed/" },
-      "id": "n00000002-0000-0000-0000-000000000000", "name": "연합뉴스TV",
-      "type": "n8n-nodes-base.rssFeedRead", "typeVersion": 1, "position": [200, 0] },
-    { "parameters": { "url": "https://www.hani.co.kr/rss/" },
-      "id": "n00000003-0000-0000-0000-000000000000", "name": "한겨레",
-      "type": "n8n-nodes-base.rssFeedRead", "typeVersion": 1, "position": [200, 200] },
-    { "parameters": { "url": "https://www.khan.co.kr/rss/rssdata/total_news.xml" },
-      "id": "n00000004-0000-0000-0000-000000000000", "name": "경향신문",
-      "type": "n8n-nodes-base.rssFeedRead", "typeVersion": 1, "position": [200, 400] },
-    { "parameters": { "url": "https://news-ex.jtbc.co.kr/v1/get/rss/issue" },
-      "id": "n00000005-0000-0000-0000-000000000000", "name": "JTBC",
-      "type": "n8n-nodes-base.rssFeedRead", "typeVersion": 1, "position": [200, 600] },
-    { "parameters": { "url": "https://www.hankyung.com/feed/all-news" },
-      "id": "n00000006-0000-0000-0000-000000000000", "name": "한국경제 전체",
-      "type": "n8n-nodes-base.rssFeedRead", "typeVersion": 1, "position": [200, 800] },
-    { "parameters": { "url": "https://www.sedaily.com/rss/newsall" },
-      "id": "n00000007-0000-0000-0000-000000000000", "name": "서울경제 전체",
-      "type": "n8n-nodes-base.rssFeedRead", "typeVersion": 1, "position": [200, 1000] },
-
-    { "parameters": { "mode": "append" }, "id": "n00000008-0000-0000-0000-000000000000",
-      "name": "Merge 1", "type": "n8n-nodes-base.merge", "typeVersion": 2, "position": [420, 100] },
-    { "parameters": { "mode": "append" }, "id": "n00000009-0000-0000-0000-000000000000",
-      "name": "Merge 2", "type": "n8n-nodes-base.merge", "typeVersion": 2, "position": [620, 300] },
-    { "parameters": { "mode": "append" }, "id": "n0000000a-0000-0000-0000-000000000000",
-      "name": "Merge 3", "type": "n8n-nodes-base.merge", "typeVersion": 2, "position": [820, 500] },
-    { "parameters": { "mode": "append" }, "id": "n0000000b-0000-0000-0000-000000000000",
-      "name": "Merge 4", "type": "n8n-nodes-base.merge", "typeVersion": 2, "position": [1020, 700] },
-    { "parameters": { "mode": "append" }, "id": "n0000000c-0000-0000-0000-000000000000",
-      "name": "Merge 5", "type": "n8n-nodes-base.merge", "typeVersion": 2, "position": [1220, 900] },
-
+    {
+      "parameters": {
+        "url": "https://www.yonhapnewstv.co.kr/browse/feed/",
+        "options": {}
+      },
+      "id": "628c8a6c-45cc-487a-b3a2-1117f26481be",
+      "name": "연합뉴스TV",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [
+        -224,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://news-ex.jtbc.co.kr/v1/get/rss/issue",
+        "options": {}
+      },
+      "id": "4c8877d9-6f85-42c8-b623-b47854fdbc51",
+      "name": "JTBC",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [
+        -224,
+        704
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://www.hankyung.com/feed/all-news",
+        "options": {}
+      },
+      "id": "e18dd247-428f-4fe2-9cb1-45080bce3334",
+      "name": "한국경제 전체",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [
+        -224,
+        896
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://www.sedaily.com/rss/newsall",
+        "options": {}
+      },
+      "id": "5e23e0ab-fd0e-45ae-819a-8f4cdb756bb3",
+      "name": "서울경제 전체",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [
+        -224,
+        1104
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "52c108ff-3303-49e9-bdb3-30a529bccc37",
+      "name": "Merge 1",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [
+        0,
+        208
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "c671ee8d-7bb7-4f12-a484-bf241e187292",
+      "name": "Merge 3",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [
+        400,
+        608
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "ee0532e0-beac-43fe-8bc4-b237feddac2f",
+      "name": "Merge 4",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [
+        592,
+        800
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "4247abd9-7e1c-4aa1-8521-c2e18ae734c9",
+      "name": "Merge 5",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [
+        800,
+        1008
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "fd7062cc-be0c-449c-97b1-67bd609c3915",
+      "name": "Merge 2",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [
+        192,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://www.yna.co.kr/rss/news.xml",
+        "options": {}
+      },
+      "id": "eb474d52-f0df-43cc-a43f-381762f34091",
+      "name": "YTN",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [
+        -224,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://www.chosun.com/arc/outboundfeeds/rss/?outputType=xml",
+        "options": {}
+      },
+      "id": "0b2adb46-cd7a-4745-a679-6f63f5ba72d0",
+      "name": "조선일보",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [
+        -224,
+        496
+      ]
+    },
     {
       "parameters": {
         "jsCode": "const titles = $input.all()\n  .map(item => item.json.title)\n  .filter(Boolean);\n\nreturn [\n  {\n    json: {\n      all_titles: titles.join('\\n'),\n      count: titles.length\n    }\n  }\n];"
       },
-      "id": "n0000000d-0000-0000-0000-000000000000",
+      "id": "8a95f20e-2286-4f87-96f6-b9f225f16b6c",
       "name": "제목 취합",
-      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [1440, 900]
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        1008
+      ]
     },
     {
       "parameters": {
-        "jsCode": "const allTitles = $input.first().json.all_titles;\n\nconst prompt = [\n  '다음은 오늘 뉴스 헤드라인 제목 목록입니다.',\n  '현재 가장 중요하고 관심을 가질 만한 검색 키워드 20개를 선정해주세요.',\n  'IT에 관심이 많고 세계, 사회 순서로 관심이 있습니다.',\n  '유사하거나 중복 의미의 키워드는 최소화하세요.',\n  '서두나 부연 설명 없이 키워드 20개만 쉼표(,)로 구분해 한 줄로만 답변하세요.',\n  '',\n  '[답변 예시]',\n  'A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T',\n  '',\n  '[제목 목록]',\n  allTitles\n].join('\\n');\n\nreturn [{\n  json: {\n    contents: [{\n      parts: [{ text: prompt }]\n    }]\n  }\n}];"
+        "jsCode": "const allTitles = $input.first().json.all_titles;\n\nconst prompt = [\n  '다음은 오늘 뉴스 헤드라인 제목 목록입니다.',\n  '현재 가장 중요하고 관심을 가질 만한 검색 키워드 20개를 선정해주세요.',\n  '',\n  '[관심 우선순위]',\n  '세계 > 사회·경제 > 정치 > IT·기술',\n  '',\n  '[선정 기준]',\n  '- 유사하거나 중복 의미의 키워드는 최소화하세요.',\n  '- 단순 사건 요약이 아닌, 검색했을 때 관련 기사가 풍부하게 나올 구체적인 키워드',\n  '- 인물명보다 사안 중심 키워드 우선 (예: \"트럼프\" 대신 \"미국 관세 협상\")',\n  '- 특정 분야가 뉴스를 독점하더라도 해당 분야 키워드는 최대 5개까지만 선정',\n  '',\n  '[출력 형식]',\n  '서두나 부연 설명 없이 키워드 3개만 쉼표(,)로 구분해 한 줄로만 답변',\n  '',\n  '[답변 예시]',\n  'A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T',\n  '',\n  '[제목 목록]',\n  allTitles\n].join('\\n');\n\nreturn [{\n  json: {\n    contents: [{\n      parts: [{ text: prompt }]\n    }]\n  }\n}];"
       },
-      "id": "n0000000e-0000-0000-0000-000000000000",
+      "id": "d6e6ba9b-99ba-4a8f-9ced-e1fe45563fb3",
       "name": "프롬프트 생성",
-      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [1660, 900]
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        1008
+      ]
     },
     {
       "parameters": {
-        "method": "POST",
-        "url": "=https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent?key={{ $env.GEMINI_API_KEY }}",
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={{ $json }}",
-        "options": {}
+        "jsCode": "const text = $input.first().json.content.parts[0].text;\n\nconst keywords = text\n  .split(',')\n  .map(k => k.replace(/[*#\\n]/g, '').trim())\n  .filter(k => k.length > 0 && k.length <= 30);\n\nreturn [{ json: { keywords } }];"
       },
-      "id": "n0000000f-0000-0000-0000-000000000000",
-      "name": "Gemini API",
-      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [1880, 900],
-      "retryOnFail": true,
-      "maxTries": 5,
-      "waitBetweenTries": 600000
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1568,
+        1008
+      ],
+      "id": "21604bf9-148e-4098-b7cd-9a96062441b8",
+      "name": "키워드 파싱"
     },
     {
       "parameters": {
-        "jsCode": "const text = $input.first().json.candidates[0].content.parts[0].text;\n\nconst keywords = text\n  .split(',')\n  .map(k => k.replace(/[*#\\n]/g, '').trim())\n  .filter(k => k.length > 0 && k.length <= 20);\n\nconst date = new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Seoul' });\nconst hour = parseInt(\n  new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul', hour: 'numeric', hour12: false })\n);\nconst period = hour < 12 ? '오전' : '오후';\n\nreturn [{ json: { keywords, date, period } }];"
+        "jsCode": "const datesRow = $input.first().json;\nconst keywords = datesRow.keywords;\n\nconst date = new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Seoul' });\nconst hour = parseInt(\n  new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul', hour: 'numeric', hour12: false })\n);\nconst period = hour < 12 ? '오전' : '오후';\n\nreturn [{ json: { keywords, date, period } }];"
       },
-      "id": "n00000010-0000-0000-0000-000000000000",
-      "name": "준비",
-      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [2100, 900]
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1728,
+        1008
+      ],
+      "id": "ec437a39-933d-4566-9cf2-7df1ada5da7f",
+      "name": "날짜/시간 계산"
     },
     {
       "parameters": {
@@ -95,9 +223,18 @@
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "apikey",        "value": "={{ $env.SUPABASE_SERVICE_ROLE_KEY }}" },
-            { "name": "Authorization", "value": "=Bearer {{ $env.SUPABASE_SERVICE_ROLE_KEY }}" },
-            { "name": "Prefer",        "value": "resolution=merge-duplicates,return=representation" }
+            {
+              "name": "apikey",
+              "value": "={{ $env.SUPABASE_SERVICE_ROLE_KEY }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.SUPABASE_SERVICE_ROLE_KEY }}"
+            },
+            {
+              "name": "Prefer",
+              "value": "resolution=merge-duplicates,return=representation"
+            }
           ]
         },
         "sendBody": true,
@@ -105,99 +242,54 @@
         "jsonBody": "={{ { date: $json.date, period: $json.period } }}",
         "options": {}
       },
-      "id": "n00000011-0000-0000-0000-000000000000",
+      "id": "1202c97f-b574-4266-8edd-74981031a29a",
       "name": "dates UPSERT",
-      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [2320, 900]
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1888,
+        1008
+      ]
     },
     {
       "parameters": {
-        "jsCode": "const datesRow = $input.first().json;\nconst date_id = (Array.isArray(datesRow) ? datesRow[0] : datesRow).id;\n\nconst { keywords, period } = $node['준비'].json;\n\nreturn keywords.map(keyword => ({ json: { date_id, keyword, period } }));"
+        "jsCode": "const staticData = $getWorkflowStaticData('global');\nstaticData.summaryCount = 0;\nreturn $input.all();"
       },
-      "id": "n00000012-0000-0000-0000-000000000000",
-      "name": "topics 생성 준비",
-      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [2540, 900]
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "={{ $env.SUPABASE_URL + '/rest/v1/topics' }}",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            { "name": "apikey",        "value": "={{ $env.SUPABASE_SERVICE_ROLE_KEY }}" },
-            { "name": "Authorization", "value": "=Bearer {{ $env.SUPABASE_SERVICE_ROLE_KEY }}" },
-            { "name": "Prefer",        "value": "return=representation" }
-          ]
-        },
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={{ { date_id: $json.date_id, topic_text: $json.keyword } }}",
-        "options": {}
-      },
-      "id": "n00000013-0000-0000-0000-000000000000",
-      "name": "Supabase topics 저장",
-      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [2760, 900]
-    },
-    {
-      "parameters": {
-        "jsCode": "return $input.all().map(item => ({\n  json: {\n    date_id: item.json.date_id,\n    keyword: item.json.keyword,\n    period:  item.json.period\n  }\n}));"
-      },
-      "id": "n00000014-0000-0000-0000-000000000000",
-      "name": "응답 정리",
-      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [2980, 900]
-    },
-
-    {
-      "parameters": {
-        "jsCode": "// 루프 시작 전 성공한 summary 카운트 초기화\nconst staticData = $getWorkflowStaticData('global');\nstaticData.summaryCount = 0;\nreturn $input.all();"
-      },
-      "id": "n00000023-0000-0000-0000-000000000000",
+      "id": "21cc169a-943b-469e-9e4d-136cb6af4f38",
       "name": "카운트 초기화",
-      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [3090, 900]
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2208,
+        1008
+      ]
     },
-
     {
       "parameters": {
         "batchSize": 1,
         "options": {}
       },
-      "id": "n00000015-0000-0000-0000-000000000000",
+      "id": "9d6e5170-0a41-4c79-af38-b3047070efe0",
       "name": "Loop Over Items",
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 1,
-      "position": [3300, 900]
-    },
-    {
-      "parameters": {
-        "url": "https://openapi.naver.com/v1/search/news.json",
-        "sendQuery": true,
-        "queryParameters": {
-          "parameters": [
-            { "name": "query",   "value": "={{ $json.keyword }}" },
-            { "name": "display", "value": "5" },
-            { "name": "sort",    "value": "sim" }
-          ]
-        },
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            { "name": "X-Naver-Client-Id",     "value": "={{ $env.NAVER_CLIENT_ID }}" },
-            { "name": "X-Naver-Client-Secret", "value": "={{ $env.NAVER_CLIENT_SECRET }}" }
-          ]
-        },
-        "options": {}
-      },
-      "id": "n00000016-0000-0000-0000-000000000000",
-      "name": "Naver 뉴스 검색",
-      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [3520, 1100]
+      "position": [
+        2368,
+        1008
+      ]
     },
     {
       "parameters": {
         "jsCode": "const keyword  = $('Loop Over Items').item.json.keyword;\nconst allItems = $input.first().json.items || [];\n\nconst decodeEntities = s => s\n  .replace(/&quot;/g, '\"')\n  .replace(/&amp;/g, '&')\n  .replace(/&lt;/g, '<')\n  .replace(/&gt;/g, '>')\n  .replace(/&#39;/g, \"'\")\n  .replace(/&apos;/g, \"'\");\n\nconst naverItems = allItems.filter(i => i.link?.includes('n.news.naver.com'));\n\nif (naverItems.length === 0) {\n  return [{ json: { skip: true, keyword } }];\n}\n\nreturn naverItems.map(item => ({\n  json: {\n    skip: false,\n    keyword,\n    title:   decodeEntities(item.title.replace(/<[^>]+>/g, '').trim()),\n    url:     item.link,\n    pubDate: item.pubDate\n  }\n}));"
       },
-      "id": "n00000017-0000-0000-0000-000000000000",
+      "id": "e4dfa213-2211-46b0-8202-d65f4100a878",
       "name": "링크 추출",
-      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [3740, 1100]
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2688,
+        1008
+      ]
     },
     {
       "parameters": {
@@ -210,180 +302,79 @@
           ]
         }
       },
-      "id": "n00000022-0000-0000-0000-000000000000",
+      "id": "cea7c305-49e8-4df6-8d4a-40da918b70ea",
       "name": "스킵 체크",
       "type": "n8n-nodes-base.if",
       "typeVersion": 1,
-      "position": [3960, 1100]
-    },
-    {
-      "parameters": {
-        "url": "={{ $json.url }}",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            { "name": "User-Agent", "value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" }
-          ]
-        },
-        "options": {
-          "response": {
-            "response": {
-              "responseFormat": "text"
-            }
-          }
-        }
-      },
-      "id": "n00000018-0000-0000-0000-000000000000",
-      "name": "기사 스크레이핑",
-      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [4180, 1100]
+      "position": [
+        2848,
+        1008
+      ]
     },
     {
       "parameters": {
         "jsCode": "const originals = $('링크 추출').all();\n\nreturn $input.all().map((item, i) => {\n  const orig = originals[i]?.json || {};\n  const html = item.json.data || '';\n\n  const areaMatch = html.match(/id=[\"']dic_area[\"'][^>]*>([\\s\\S]*?)<\\/article>/);\n  let content = '';\n  if (areaMatch) {\n    content = areaMatch[1]\n      .replace(/<script[\\s\\S]*?<\\/script>/gi, '')\n      .replace(/<style[\\s\\S]*?<\\/style>/gi, '')\n      .replace(/<[^>]+>/g, ' ')\n      .replace(/\\s+/g, ' ')\n      .trim()\n      .slice(0, 2000);\n  }\n\n  const published_date = (() => {\n    try { return new Date(orig.pubDate).toLocaleDateString('sv-SE', { timeZone: 'Asia/Seoul' }); }\n    catch(e) { return new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Seoul' }); }\n  })();\n\n  return {\n    json: {\n      keyword:        orig.keyword,\n      title:          orig.title,\n      url:            orig.url,\n      published_date,\n      content\n    }\n  };\n});"
       },
-      "id": "n00000019-0000-0000-0000-000000000000",
+      "id": "e7a4984a-40e0-43c4-b667-358be6355d3d",
       "name": "본문 추출",
-      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [4400, 1100]
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "={{ $env.SUPABASE_URL + '/rest/v1/articles?on_conflict=url' }}",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            { "name": "apikey",        "value": "={{ $env.SUPABASE_SERVICE_ROLE_KEY }}" },
-            { "name": "Authorization", "value": "=Bearer {{ $env.SUPABASE_SERVICE_ROLE_KEY }}" },
-            { "name": "Prefer",        "value": "resolution=merge-duplicates,return=representation" }
-          ]
-        },
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={{ { topic_id: $json.topic_id, title: $json.title, url: $json.url, published_date: $json.published_date } }}",
-        "options": {}
-      },
-      "id": "n0000001b-0000-0000-0000-000000000000",
-      "name": "articles UPSERT",
-      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [4620, 1100]
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3168,
+        1008
+      ]
     },
     {
       "parameters": {
         "jsCode": "const articles = $('본문 추출').all();\nconst keyword  = $('Loop Over Items').item.json.keyword;\n\nconst articlesText = articles\n  .map((item, i) => `[기사 ${i + 1}]\\n${item.json.content}`)\n  .filter(t => t.trim().length > 15)\n  .join('\\n\\n');\n\nreturn [{ json: { keyword, articles_text: articlesText } }];"
       },
-      "id": "n0000001c-0000-0000-0000-000000000000",
+      "id": "3abf43ec-399c-435e-8204-47288e26e5c0",
       "name": "본문 취합",
-      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [4840, 1100]
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3328,
+        1008
+      ]
     },
     {
       "parameters": {
-        "jsCode": "const { keyword, articles_text } = $input.first().json;\n\nconst prompt = [\n  '당신은 전문 뉴스 애널리스트입니다.',\n  `아래는 '${keyword}'와 관련된 기사 본문입니다.`,\n  '',\n  '[기사 묶음]',\n  articles_text,\n  '',\n  '[작성 순서]',\n  '① 먼저 설명할 전문 용어 3~5개를 선정하세요.',\n  '② 요약문을 작성할 때, 선정한 용어를 선정 시 결정한 표현 그대로 사용하세요.',\n  '③ 용어 설명 섹션에서는 ②에서 실제로 사용한 표현을 그대로 용어명으로 씁니다.',\n  '',\n  '[답변 규칙 - 반드시 준수]',\n  '- 아래 형식을 한 글자도 바꾸지 말고 그대로 사용하세요.',\n  '- ### 요약 ### 과 ### 용어 설명 ### 사이에 구분선(--)이나 다른 텍스트를 절대 넣지 마세요.',\n  '- 두 섹션 외의 어떤 머리말, 인사말, 부연 설명도 출력하지 마세요.',\n  '- 용어 설명의 용어명은 요약문에 등장하는 표현과 완전히 동일해야 합니다.',\n  '- 용어명에 괄호를 절대 사용하지 마세요. 영어 병기도 금지입니다. 예) **테이프 아웃:** 설명 (O) / **테이프 아웃(Tape-out):** 설명 (X) / **TC 본더(TC 본더):** 설명 (X)',\n  '',\n  '[답변 형식]',\n  '### 요약 ###',\n  '(요약 내용만 작성, 3~5문장)',\n  '### 용어 설명 ###',\n  '- **용어명:** 설명'\n].join('\\n');\n\nreturn [{\n  json: {\n    contents: [{ parts: [{ text: prompt }] }]\n  }\n}];"
+        "jsCode": "const { keyword, articles_text } = $input.first().json;\n\nif (!articles_text || articles_text.trim().length < 100) {\n  return [{ json: { skip: true } }];\n}\n\nconst prompt = [\n  '당신은 전문 뉴스 애널리스트입니다.',\n  `아래는 '${keyword}'와 관련된 기사 본문입니다.`,\n  '',\n  '[기사 묶음]',\n  articles_text,\n  '',\n  '[작성 순서]',\n  '① 먼저 일반인이 알고 있기 어려운 전문 용어가 있다면 최대 3개를 선정하세요. 없다면 ### 용어 설명 ### 섹션은 비워두세요.',\n  '② 요약문을 작성할 때, 선정한 용어를 선정 시 결정한 표현 그대로 사용하세요.',\n  '③ 용어 설명 섹션에서는 ②에서 실제로 사용한 표현을 그대로 용어명으로 씁니다.',\n  '',\n  '[답변 규칙 - 반드시 준수]',\n  '- 아래 형식을 한 글자도 바꾸지 말고 그대로 사용하세요.',\n  '- ### 요약 ### 과 ### 용어 설명 ### 사이에 구분선(--)이나 다른 텍스트를 절대 넣지 마세요.',\n  '- 두 섹션 외의 어떤 머리말, 인사말, 부연 설명도 출력하지 마세요.',\n  '- 용어 설명의 용어명은 요약문에 등장하는 표현과 완전히 동일해야 합니다.',\n  '- 용어명에 괄호를 절대 사용하지 마세요. 영어 병기도 금지입니다. 예) **테이프 아웃:** 설명 (O) / **테이프 아웃(Tape-out):** 설명 (X) / **TC 본더(TC 본더):** 설명 (X)',\n  '- 요약은 사건의 배경, 현재 상황, 전망 순서로 작성하세요.',\n  '- 숫자나 고유명사 등 구체적인 정보를 포함하세요.',\n  '- 용어 설명은 해당 용어를 처음 듣는 사람도 이해할 수 있게 2~3문장으로 작성하세요.',\n  '- 요약문 안에 **볼드**, `코드`, _이탤릭_ 등 어떤 마크다운 서식도 사용하지 마세요. 순수 텍스트로만 작성하세요.',\n  '',\n  '[답변 형식]',\n  '### 요약 ###',\n  '(요약 내용만 작성, 3~5문장)',\n  '### 용어 설명 ###',\n  '- **용어명:** 설명'\n].join('\\n');\n\nreturn [{\n  json: {\n    contents: [{ parts: [{ text: prompt }] }]\n  }\n}];"
       },
-      "id": "n0000001d-0000-0000-0000-000000000000",
+      "id": "10971dd8-ae23-4fe9-ba8f-d8248861236b",
       "name": "요약 프롬프트 생성",
-      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [5060, 1100]
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3488,
+        1008
+      ]
     },
     {
       "parameters": {
-        "method": "POST",
-        "url": "=https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent?key={{ $env.GEMINI_API_KEY }}",
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={{ { contents: $json.contents } }}",
-        "options": {}
+        "jsCode": "const text = $input.first().json.content.parts[0].text;\n\nconst summaryMatch = text.match(/#+\\s*요약\\s*#+\\s*\\n([\\s\\S]*?)(?=#+\\s*용어|$)/);\nconst termsMatch   = text.match(/#+\\s*용어\\s*설명?\\s*#+\\s*\\n([\\s\\S]*)$/);\n\nconst summary_text     = summaryMatch ? summaryMatch[1].trim() : text.trim();\nconst term_explanation = termsMatch   ? termsMatch[1].trim()   : '';\n\nreturn [{ json: { summary_text, term_explanation } }];"
       },
-      "id": "n0000001e-0000-0000-0000-000000000000",
-      "name": "Gemini 요약 API",
-      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [5280, 1100],
-      "retryOnFail": true,
-      "maxTries": 5,
-      "waitBetweenTries": 600000
-    },
-    {
-      "parameters": {
-        "jsCode": "const text = $input.first().json.candidates[0].content.parts[0].text;\n\nconst summaryMatch = text.match(/#+\\s*요약\\s*#+\\s*\\n([\\s\\S]*?)(?=#+\\s*용어|$)/);\nconst termsMatch   = text.match(/#+\\s*용어\\s*설명?\\s*#+\\s*\\n([\\s\\S]*)$/);\n\nconst summary_text     = summaryMatch ? summaryMatch[1].trim() : text.trim();\nconst term_explanation = termsMatch   ? termsMatch[1].trim()   : '';\n\nreturn [{ json: { summary_text, term_explanation } }];"
-      },
-      "id": "n0000001f-0000-0000-0000-000000000000",
+      "id": "7ee3a51d-0c73-417e-ae9b-4c0ca388ff4a",
       "name": "요약 파싱",
-      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [5500, 1100]
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3936,
+        1008
+      ]
     },
     {
       "parameters": {
-        "method": "POST",
-        "url": "={{ $env.SUPABASE_URL + '/rest/v1/summaries?on_conflict=topic_id' }}",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            { "name": "apikey",        "value": "={{ $env.SUPABASE_SERVICE_ROLE_KEY }}" },
-            { "name": "Authorization", "value": "=Bearer {{ $env.SUPABASE_SERVICE_ROLE_KEY }}" },
-            { "name": "Prefer",        "value": "resolution=merge-duplicates,return=representation" }
-          ]
-        },
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={{ { topic_id: $json.topic_id, summary_text: $json.summary_text, term_explanation: $json.term_explanation } }}",
-        "options": {}
+        "jsCode": "const staticData = $getWorkflowStaticData('global');\nif (!staticData.summaryCount) staticData.summaryCount = 0;\nstaticData.summaryCount++;\nconst done = staticData.summaryCount >= 10;\nreturn [{ json: { done, count: staticData.summaryCount } }];"
       },
-      "id": "n00000020-0000-0000-0000-000000000000",
-      "name": "summaries UPSERT",
-      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [6380, 1100]
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "={{ $env.SUPABASE_URL + '/rest/v1/topics' }}",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            { "name": "apikey",        "value": "={{ $env.SUPABASE_SERVICE_ROLE_KEY }}" },
-            { "name": "Authorization", "value": "=Bearer {{ $env.SUPABASE_SERVICE_ROLE_KEY }}" },
-            { "name": "Prefer",        "value": "return=representation" }
-          ]
-        },
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={{ { date_id: $('Loop Over Items').item.json.date_id, topic_text: $('Loop Over Items').item.json.keyword } }}",
-        "options": {}
-      },
-      "id": "n00000026-0000-0000-0000-000000000000",
-      "name": "topic 저장",
-      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [5720, 1100]
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "={{ $env.SUPABASE_URL + '/rest/v1/articles?on_conflict=url' }}",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            { "name": "apikey",        "value": "={{ $env.SUPABASE_SERVICE_ROLE_KEY }}" },
-            { "name": "Authorization", "value": "=Bearer {{ $env.SUPABASE_SERVICE_ROLE_KEY }}" },
-            { "name": "Prefer",        "value": "resolution=merge-duplicates,return=representation" }
-          ]
-        },
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={{ $('본문 추출').all().map(a => ({ topic_id: (Array.isArray($input.first().json) ? $input.first().json[0].id : $input.first().json.id), title: a.json.title, url: a.json.url, published_date: a.json.published_date })) }}",
-        "options": {}
-      },
-      "id": "n00000027-0000-0000-0000-000000000000",
-      "name": "articles 배치 저장",
-      "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [5940, 1100]
-    },
-    {
-      "parameters": {
-        "jsCode": "const topicRow = $('topic 저장').first().json;\nconst topic_id = Array.isArray(topicRow) ? topicRow[0].id : topicRow.id;\nconst { summary_text, term_explanation } = $('요약 파싱').first().json;\nreturn [{ json: { topic_id, summary_text, term_explanation } }];"
-      },
-      "id": "n00000028-0000-0000-0000-000000000000",
-      "name": "summary 준비",
-      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [6160, 1100]
-    },
-    {
-      "parameters": {
-        "jsCode": "// summary 성공 카운트 증가 후 10개 달성 여부 확인\nconst staticData = $getWorkflowStaticData('global');\nif (!staticData.summaryCount) staticData.summaryCount = 0;\nstaticData.summaryCount++;\nconst done = staticData.summaryCount >= 10;\nreturn [{ json: { done, count: staticData.summaryCount } }];"
-      },
-      "id": "n00000024-0000-0000-0000-000000000000",
+      "id": "7ee07b92-cd14-4ad9-a87f-1c8ad9e7eb04",
       "name": "요약 카운트",
-      "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [6600, 1100]
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4560,
+        1008
+      ]
     },
     {
       "parameters": {
@@ -396,89 +387,732 @@
           ]
         }
       },
-      "id": "n00000025-0000-0000-0000-000000000000",
+      "id": "7901e288-e007-4b0e-954d-14cecec8bfa6",
       "name": "완료 체크",
       "type": "n8n-nodes-base.if",
       "typeVersion": 1,
-      "position": [6820, 1100]
+      "position": [
+        4704,
+        1008
+      ]
     },
     {
       "parameters": {
-        "resume": "timeInterval",
-        "amount": 30,
+        "url": "https://openapi.naver.com/v1/search/news.json",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "query",
+              "value": "={{ $json.keyword }}"
+            },
+            {
+              "name": "display",
+              "value": "3"
+            },
+            {
+              "name": "sort",
+              "value": "sim"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Naver-Client-Id",
+              "value": "={{ $env.NAVER_CLIENT_ID }}"
+            },
+            {
+              "name": "X-Naver-Client-Secret",
+              "value": "={{ $env.NAVER_CLIENT_SECRET }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "da173d08-0caa-476e-b281-cf7d38373fa5",
+      "name": "Naver News API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2528,
+        1008
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "text"
+            }
+          }
+        }
+      },
+      "id": "1ff0ccaf-ae87-4a58-875d-3fabf618a900",
+      "name": "기사 스크래핑",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3008,
+        1008
+      ]
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.contents[0].parts[0].text }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        3648,
+        1008
+      ],
+      "id": "26be128b-1efa-4d6c-8d36-0485258053d1",
+      "name": "기사 요약",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "QtaLvOaSRxEiFMYR",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.contents[0].parts[0].text }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        1280,
+        1008
+      ],
+      "id": "dd7338fd-2cb1-4249-af62-f22cd1533c6b",
+      "name": "토픽 추출",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "QtaLvOaSRxEiFMYR",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "summaries",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "topic_id",
+              "fieldValue": "={{ $json.topic_id }}"
+            },
+            {
+              "fieldId": "summary_text",
+              "fieldValue": "={{ $('요약 파싱').item.json.summary_text }}"
+            },
+            {
+              "fieldId": "term_explanation",
+              "fieldValue": "={{ $('요약 파싱').item.json.term_explanation }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        4400,
+        1008
+      ],
+      "id": "fc10a28f-6961-481b-9d33-06bb0a5ff36f",
+      "name": "summary 저장",
+      "executeOnce": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "42viLO2Pf2jOAuok",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SUPABASE_URL + '/rest/v1/articles?on_conflict=url' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $env.SUPABASE_SERVICE_ROLE_KEY }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.SUPABASE_SERVICE_ROLE_KEY }}"
+            },
+            {
+              "name": "Prefer",
+              "value": "resolution=merge-duplicates,return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $('본문 추출').all().map(a => ({ topic_id: (Array.isArray($input.first().json) ? $input.first().json[0].id : $input.first().json.id), title: a.json.title, url: a.json.url, published_date: a.json.published_date })) }}",
+        "options": {}
+      },
+      "id": "bd1f95e6-09f0-46a9-98fb-34c6c57c7619",
+      "name": "articles 저장",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4240,
+        1008
+      ]
+    },
+    {
+      "parameters": {
+        "tableId": "topics",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "date_id",
+              "fieldValue": "={{ $('Loop Over Items').item.json.date_id }}"
+            },
+            {
+              "fieldId": "topic_text",
+              "fieldValue": "={{ $('Loop Over Items').item.json.keyword }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        4096,
+        1008
+      ],
+      "id": "60b1e524-2c8e-471f-afd7-faecd2452dd1",
+      "name": "topic 저장",
+      "credentials": {
+        "supabaseApi": {
+          "id": "42viLO2Pf2jOAuok",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 20,
         "unit": "seconds"
       },
-      "id": "n00000021-0000-0000-0000-000000000000",
-      "name": "5초 대기",
+      "id": "360fc30d-aaa5-43bd-8d2a-26da373877cd",
+      "name": "20초 대기",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1,
-      "position": [7040, 1100],
+      "position": [
+        2848,
+        1264
+      ],
       "webhookId": "w00000001-0000-0000-0000-000000000000"
+    },
+    {
+      "parameters": {
+        "jsCode": "const datesRow = $input.first().json;\nconst date_id = (Array.isArray(datesRow) ? datesRow[0] : datesRow).id;\n\nconst { keywords, period } = $node['날짜/시간 계산'].json;\n\nreturn keywords.map(keyword => ({ json: { date_id, keyword, period } }));"
+      },
+      "id": "613a31f8-e8bb-4e7d-9d3e-c699755031e7",
+      "name": "topics 생성 준비",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2048,
+        1008
+      ]
     }
   ],
+  "pinData": {},
   "connections": {
     "스케줄 트리거": {
-      "main": [[
-        { "node": "연합뉴스TV",   "type": "main", "index": 0 },
-        { "node": "한겨레",       "type": "main", "index": 0 },
-        { "node": "경향신문",     "type": "main", "index": 0 },
-        { "node": "JTBC",        "type": "main", "index": 0 },
-        { "node": "한국경제 전체", "type": "main", "index": 0 },
-        { "node": "서울경제 전체", "type": "main", "index": 0 }
-      ]]
+      "main": [
+        [
+          {
+            "node": "연합뉴스TV",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "YTN",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "조선일보",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "JTBC",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "한국경제 전체",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "서울경제 전체",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
-    "연합뉴스TV":   { "main": [[{ "node": "Merge 1", "type": "main", "index": 0 }]] },
-    "한겨레":       { "main": [[{ "node": "Merge 1", "type": "main", "index": 1 }]] },
-    "Merge 1":     { "main": [[{ "node": "Merge 2", "type": "main", "index": 0 }]] },
-    "경향신문":     { "main": [[{ "node": "Merge 2", "type": "main", "index": 1 }]] },
-    "Merge 2":     { "main": [[{ "node": "Merge 3", "type": "main", "index": 0 }]] },
-    "JTBC":        { "main": [[{ "node": "Merge 3", "type": "main", "index": 1 }]] },
-    "Merge 3":     { "main": [[{ "node": "Merge 4", "type": "main", "index": 0 }]] },
-    "한국경제 전체": { "main": [[{ "node": "Merge 4", "type": "main", "index": 1 }]] },
-    "Merge 4":     { "main": [[{ "node": "Merge 5", "type": "main", "index": 0 }]] },
-    "서울경제 전체": { "main": [[{ "node": "Merge 5", "type": "main", "index": 1 }]] },
-    "Merge 5":              { "main": [[{ "node": "제목 취합",           "type": "main", "index": 0 }]] },
-    "제목 취합":             { "main": [[{ "node": "프롬프트 생성",        "type": "main", "index": 0 }]] },
-    "프롬프트 생성":          { "main": [[{ "node": "Gemini API",          "type": "main", "index": 0 }]] },
-    "Gemini API":           { "main": [[{ "node": "준비",                 "type": "main", "index": 0 }]] },
-    "준비":                 { "main": [[{ "node": "dates UPSERT",         "type": "main", "index": 0 }]] },
-    "dates UPSERT":         { "main": [[{ "node": "topics 생성 준비",     "type": "main", "index": 0 }]] },
-    "topics 생성 준비":      { "main": [[{ "node": "응답 정리",            "type": "main", "index": 0 }]] },
-    "응답 정리":             { "main": [[{ "node": "카운트 초기화",         "type": "main", "index": 0 }]] },
-    "카운트 초기화":          { "main": [[{ "node": "Loop Over Items",      "type": "main", "index": 0 }]] },
+    "연합뉴스TV": {
+      "main": [
+        [
+          {
+            "node": "Merge 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "JTBC": {
+      "main": [
+        [
+          {
+            "node": "Merge 3",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "한국경제 전체": {
+      "main": [
+        [
+          {
+            "node": "Merge 4",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "서울경제 전체": {
+      "main": [
+        [
+          {
+            "node": "Merge 5",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge 1": {
+      "main": [
+        [
+          {
+            "node": "Merge 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge 3": {
+      "main": [
+        [
+          {
+            "node": "Merge 4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge 4": {
+      "main": [
+        [
+          {
+            "node": "Merge 5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge 2": {
+      "main": [
+        [
+          {
+            "node": "Merge 3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "YTN": {
+      "main": [
+        [
+          {
+            "node": "Merge 1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "조선일보": {
+      "main": [
+        [
+          {
+            "node": "Merge 2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "제목 취합": {
+      "main": [
+        [
+          {
+            "node": "프롬프트 생성",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge 5": {
+      "main": [
+        [
+          {
+            "node": "제목 취합",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "프롬프트 생성": {
+      "main": [
+        [
+          {
+            "node": "토픽 추출",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "키워드 파싱": {
+      "main": [
+        [
+          {
+            "node": "날짜/시간 계산",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "날짜/시간 계산": {
+      "main": [
+        [
+          {
+            "node": "dates UPSERT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "dates UPSERT": {
+      "main": [
+        [
+          {
+            "node": "topics 생성 준비",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
     "Loop Over Items": {
       "main": [
-        [{ "node": "Naver 뉴스 검색", "type": "main", "index": 0 }],
-        []
+        [
+          {
+            "node": "Naver News API",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
-    "Naver 뉴스 검색": { "main": [[{ "node": "링크 추출",       "type": "main", "index": 0 }]] },
-    "링크 추출":       { "main": [[{ "node": "스킵 체크",        "type": "main", "index": 0 }]] },
+    "링크 추출": {
+      "main": [
+        [
+          {
+            "node": "스킵 체크",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
     "스킵 체크": {
       "main": [
-        [{ "node": "5초 대기",       "type": "main", "index": 0 }],
-        [{ "node": "기사 스크레이핑", "type": "main", "index": 0 }]
+        [
+          {
+            "node": "20초 대기",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "topics 생성 준비",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "기사 스크래핑",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
-    "기사 스크레이핑":   { "main": [[{ "node": "본문 추출",          "type": "main", "index": 0 }]] },
-    "본문 추출":        { "main": [[{ "node": "본문 취합",           "type": "main", "index": 0 }]] },
-    "본문 취합":        { "main": [[{ "node": "요약 프롬프트 생성",   "type": "main", "index": 0 }]] },
-    "요약 프롬프트 생성": { "main": [[{ "node": "Gemini 요약 API",   "type": "main", "index": 0 }]] },
-    "Gemini 요약 API":  { "main": [[{ "node": "요약 파싱",           "type": "main", "index": 0 }]] },
-    "요약 파싱":           { "main": [[{ "node": "topic 저장",          "type": "main", "index": 0 }]] },
-    "topic 저장":          { "main": [[{ "node": "articles 배치 저장", "type": "main", "index": 0 }]] },
-    "articles 배치 저장":  { "main": [[{ "node": "summary 준비",        "type": "main", "index": 0 }]] },
-    "summary 준비":        { "main": [[{ "node": "summaries UPSERT",   "type": "main", "index": 0 }]] },
-    "summaries UPSERT":    { "main": [[{ "node": "요약 카운트",         "type": "main", "index": 0 }]] },
-    "요약 카운트":      { "main": [[{ "node": "완료 체크",           "type": "main", "index": 0 }]] },
+    "본문 추출": {
+      "main": [
+        [
+          {
+            "node": "본문 취합",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "본문 취합": {
+      "main": [
+        [
+          {
+            "node": "요약 프롬프트 생성",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "요약 프롬프트 생성": {
+      "main": [
+        [
+          {
+            "node": "기사 요약",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "요약 파싱": {
+      "main": [
+        [
+          {
+            "node": "topic 저장",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "요약 카운트": {
+      "main": [
+        [
+          {
+            "node": "완료 체크",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
     "완료 체크": {
       "main": [
         [],
-        [{ "node": "5초 대기", "type": "main", "index": 0 }]
+        [
+          {
+            "node": "20초 대기",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
-    "5초 대기": { "main": [[{ "node": "Loop Over Items", "type": "main", "index": 0 }]] }
+    "카운트 초기화": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Naver News API": {
+      "main": [
+        [
+          {
+            "node": "링크 추출",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "기사 스크래핑": {
+      "main": [
+        [
+          {
+            "node": "본문 추출",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "토픽 추출": {
+      "main": [
+        [
+          {
+            "node": "키워드 파싱",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "기사 요약": {
+      "main": [
+        [
+          {
+            "node": "요약 파싱",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "summary 저장": {
+      "main": [
+        [
+          {
+            "node": "요약 카운트",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "articles 저장": {
+      "main": [
+        [
+          {
+            "node": "summary 저장",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "topic 저장": {
+      "main": [
+        [
+          {
+            "node": "articles 저장",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "20초 대기": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "topics 생성 준비": {
+      "main": [
+        [
+          {
+            "node": "카운트 초기화",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
   },
-  "active": true,
-  "settings": {}
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "dc695d7c-6444-43fe-b67e-0d306b34e717",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d7602ed70a080880ee2bf6d08ea0692f805408af647865f14f7c63b06bfa917e"
+  },
+  "id": "8RgNHLilKLHrpuZq",
+  "tags": []
 }
