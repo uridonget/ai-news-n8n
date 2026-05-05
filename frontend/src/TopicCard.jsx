@@ -14,10 +14,10 @@ function decodeEntities(str) {
 function parseTerms(text) {
   if (!text) return {}
   const terms = {}
-  const regex = /\*\*([^*:]+):?\*\*:?\s*(.+)/g
+  const regex = /^([^:\n]+):\s*(.+)$/gm
   let match
   while ((match = regex.exec(text)) !== null) {
-    const term = match[1].replace(/\([^)]*\)/g, '').replace(/:$/, '').trim()
+    const term = match[1].replace(/\([^)]*\)/g, '').trim()
     const def = match[2].trim()
     if (term && def) terms[term] = def
   }
