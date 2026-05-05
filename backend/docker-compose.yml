@@ -15,10 +15,11 @@ services:
       - N8N_PROXY_HOPS=1
       - N8N_BLOCK_ENV_ACCESS_IN_NODE=false
       - N8N_IMPORT_ACTIVE_WORKFLOWS_DEACTIVATED=false
-    entrypoint: ["sh", "-c", "n8n import:workflow --separate --input=/workflows && exec n8n"]
+    entrypoint: ["/entrypoint.sh"]
     volumes:
       - n8n_data:/home/node/.n8n
       - ./workflows:/workflows:ro
+      - ./credentials.template.json:/credentials.template.json:ro
     networks:
       - n8n_net
 

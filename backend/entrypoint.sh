@@ -1,0 +1,12 @@
+#!/bin/sh
+set -e
+
+sed "s|\${GEMINI_API_KEY}|${GEMINI_API_KEY}|g;
+     s|\${SUPABASE_URL}|${SUPABASE_URL}|g;
+     s|\${SUPABASE_SERVICE_ROLE_KEY}|${SUPABASE_SERVICE_ROLE_KEY}|g" \
+  /credentials.template.json > /tmp/credentials.json
+
+n8n import:credentials --skipDuplicates --input=/tmp/credentials.json
+n8n import:workflow --separate --skipDuplicates --input=/workflows
+
+exec n8n

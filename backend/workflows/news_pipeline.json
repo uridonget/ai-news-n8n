@@ -339,7 +339,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const { keyword, articles_text } = $input.first().json;\n\nif (!articles_text || articles_text.trim().length < 100) {\n  return [{ json: { skip: true } }];\n}\n\nconst prompt = [\n  '당신은 전문 뉴스 애널리스트입니다.',\n  `아래는 '${keyword}'와 관련된 기사 본문입니다.`,\n  '',\n  '[기사 묶음]',\n  articles_text,\n  '',\n  '[작성 순서]',\n  '① 먼저 일반인이 알고 있기 어려운 전문 용어가 있다면 최대 3개를 선정하세요. 없다면 ### 용어 설명 ### 섹션은 비워두세요.',\n  '② 요약문을 작성할 때, 선정한 용어를 선정 시 결정한 표현 그대로 사용하세요.',\n  '③ 용어 설명 섹션에서는 ②에서 실제로 사용한 표현을 그대로 용어명으로 씁니다.',\n  '',\n  '[답변 규칙 - 반드시 준수]',\n  '- 아래 형식을 한 글자도 바꾸지 말고 그대로 사용하세요.',\n  '- ### 요약 ### 과 ### 용어 설명 ### 사이에 구분선(--)이나 다른 텍스트를 절대 넣지 마세요.',\n  '- 두 섹션 외의 어떤 머리말, 인사말, 부연 설명도 출력하지 마세요.',\n  '- 용어 설명의 용어명은 요약문에 등장하는 표현과 완전히 동일해야 합니다.',\n  '- 용어명에 괄호를 절대 사용하지 마세요. 영어 병기도 금지입니다. 예) **테이프 아웃:** 설명 (O) / **테이프 아웃(Tape-out):** 설명 (X) / **TC 본더(TC 본더):** 설명 (X)',\n  '- 요약은 사건의 배경, 현재 상황, 전망 순서로 작성하세요.',\n  '- 숫자나 고유명사 등 구체적인 정보를 포함하세요.',\n  '- 용어 설명은 해당 용어를 처음 듣는 사람도 이해할 수 있게 2~3문장으로 작성하세요.',\n  '- 요약문 안에 **볼드**, `코드`, _이탤릭_ 등 어떤 마크다운 서식도 사용하지 마세요. 순수 텍스트로만 작성하세요.',\n  '',\n  '[답변 형식]',\n  '### 요약 ###',\n  '(요약 내용만 작성, 3~5문장)',\n  '### 용어 설명 ###',\n  '- **용어명:** 설명'\n].join('\\n');\n\nreturn [{\n  json: {\n    contents: [{ parts: [{ text: prompt }] }]\n  }\n}];"
+        "jsCode": "const { keyword, articles_text } = $input.first().json;\n\nif (!articles_text || articles_text.trim().length < 100) {\n  return [{ json: { skip: true } }];\n}\n\nconst prompt = [\n  '당신은 전문 뉴스 애널리스트입니다.',\n  `아래는 '${keyword}'와 관련된 기사 본문입니다.`,\n  '',\n  '[기사 묶음]',\n  articles_text,\n  '',\n  '[작성 지침]',\n  '① 일반인이 알기 어려운 전문 용어를 최대 3개 선정하세요. 없다면 terms는 빈 배열로 두세요.',\n  '② summary에서 선정한 용어를 그대로 사용하세요.',\n  '③ terms의 term 값은 summary에 등장하는 표현과 완전히 동일해야 합니다.',\n  '',\n  '[규칙]',\n  '- summary는 사건의 배경, 현재 상황, 전망 순서로 3~5문장 작성하세요.',\n  '- summary는 순수 텍스트만 허용합니다. **, __, _, ` 등 마크다운 기호를 절대 사용하지 마세요.',\n  '- 모든 문장은 \\'~습니다\\', \\'~입니다\\' 형태의 존댓말로 통일하세요.',\n  '- 숫자, 고유명사 등 구체적인 정보를 포함하세요.',\n  '- explanation은 해당 용어를 처음 듣는 사람도 이해할 수 있게 2~3문장으로 작성하세요.',\n  '- term에 괄호나 영어 병기를 사용하지 마세요. 예) 테이프 아웃 (O) / 테이프 아웃(Tape-out) (X)',\n  '',\n  '[출력 형식]',\n  '아래 JSON만 출력하세요. 다른 텍스트는 일절 포함하지 마세요.',\n  '{',\n  '  \"summary\": \"요약 내용 (3~5문장, 순수 텍스트, 존댓말)\",',\n  '  \"terms\": [',\n  '    { \"term\": \"용어명\", \"explanation\": \"설명 (2~3문장)\" }',\n  '  ]',\n  '}'\n].join('\\n');\n\nreturn [{\n  json: {\n    contents: [{ parts: [{ text: prompt }] }]\n  }\n}];"
       },
       "id": "10971dd8-ae23-4fe9-ba8f-d8248861236b",
       "name": "요약 프롬프트 생성",
@@ -352,7 +352,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const text = $input.first().json.content.parts[0].text;\n\nconst summaryMatch = text.match(/#+\\s*요약\\s*#+\\s*\\n([\\s\\S]*?)(?=#+\\s*용어|$)/);\nconst termsMatch   = text.match(/#+\\s*용어\\s*설명?\\s*#+\\s*\\n([\\s\\S]*)$/);\n\nconst summary_text     = summaryMatch ? summaryMatch[1].trim() : text.trim();\nconst term_explanation = termsMatch   ? termsMatch[1].trim()   : '';\n\nreturn [{ json: { summary_text, term_explanation } }];"
+        "jsCode": "const text = $input.first().json.content.parts[0].text;\n\nlet summary_text = '';\nlet term_explanation = '';\n\ntry {\n  const jsonMatch = text.match(/\\{[\\s\\S]*\\}/);\n  if (!jsonMatch) throw new Error('JSON not found');\n\n  const parsed = JSON.parse(jsonMatch[0]);\n\n  summary_text = (parsed.summary || '').trim();\n\n  if (Array.isArray(parsed.terms) && parsed.terms.length > 0) {\n    term_explanation = parsed.terms\n      .filter(t => t.term && t.explanation)\n      .map(t => `${t.term}: ${t.explanation}`)\n      .join('\\n');\n  }\n} catch (e) {\n  // JSON 파싱 실패 시 기존 방식으로 fallback\n  const summaryMatch = text.match(/#+\\s*요약\\s*#+\\s*\\n([\\s\\S]*?)(?=#+\\s*용어|$)/);\n  const termsMatch   = text.match(/#+\\s*용어\\s*설명?\\s*#+\\s*\\n([\\s\\S]*)$/);\n\n  summary_text = summaryMatch ? summaryMatch[1].trim() : text.trim();\n  term_explanation = termsMatch ? termsMatch[1].trim() : '';\n}\n\n// 혹시 남아있는 마크다운 기호 제거 (안전장치)\nsummary_text = summary_text\n  .replace(/\\*\\*([^*]+)\\*\\*/g, '$1')\n  .replace(/__([^_]+)__/g, '$1')\n  .replace(/_([^\\s_][^_]*)_/g, '$1')\n  .replace(/`([^`]+)`/g, '$1');\n\nreturn [{ json: { summary_text, term_explanation } }];"
       },
       "id": "7ee3a51d-0c73-417e-ae9b-4c0ca388ff4a",
       "name": "요약 파싱",
@@ -497,8 +497,8 @@
       "name": "기사 요약",
       "credentials": {
         "googlePalmApi": {
-          "id": "QtaLvOaSRxEiFMYR",
-          "name": "Google Gemini(PaLM) Api account"
+          "name": "Google Gemini(PaLM) Api account",
+          "id": "gemini-api-credential"
         }
       }
     },
@@ -530,8 +530,8 @@
       "name": "토픽 추출",
       "credentials": {
         "googlePalmApi": {
-          "id": "QtaLvOaSRxEiFMYR",
-          "name": "Google Gemini(PaLM) Api account"
+          "name": "Google Gemini(PaLM) Api account",
+          "id": "gemini-api-credential"
         }
       }
     },
@@ -566,8 +566,8 @@
       "executeOnce": true,
       "credentials": {
         "supabaseApi": {
-          "id": "42viLO2Pf2jOAuok",
-          "name": "Supabase account"
+          "name": "Supabase account",
+          "id": "supabase-api-credential"
         }
       }
     },
@@ -632,8 +632,8 @@
       "name": "topic 저장",
       "credentials": {
         "supabaseApi": {
-          "id": "42viLO2Pf2jOAuok",
-          "name": "Supabase account"
+          "name": "Supabase account",
+          "id": "supabase-api-credential"
         }
       }
     },
