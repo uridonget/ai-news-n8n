@@ -6,7 +6,9 @@ sed "s|\${GEMINI_API_KEY}|${GEMINI_API_KEY}|g;
      s|\${SUPABASE_SERVICE_ROLE_KEY}|${SUPABASE_SERVICE_ROLE_KEY}|g;
      s|\${AWS_ACCESS_KEY_ID}|${AWS_ACCESS_KEY_ID}|g;
      s|\${AWS_SECRET_ACCESS_KEY}|${AWS_SECRET_ACCESS_KEY}|g;
-     s|\${AWS_REGION}|${AWS_REGION}|g" \
+     s|\${AWS_REGION}|${AWS_REGION}|g;
+     s|\${TAROT_SUPABASE_URL}|${TAROT_SUPABASE_URL}|g;
+     s|\${TAROT_SUPABASE_SERVICE_ROLE_KEY}|${TAROT_SUPABASE_SERVICE_ROLE_KEY}|g" \
   /credentials.template.json > /tmp/credentials.json
 
 n8n import:credentials --skipDuplicates --input=/tmp/credentials.json

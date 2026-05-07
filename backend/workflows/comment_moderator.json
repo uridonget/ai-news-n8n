@@ -1,0 +1,277 @@
+{
+  "name": "comment moderator",
+  "nodes": [
+    {
+      "parameters": {
+        "queue": "https://sqs.ap-northeast-2.amazonaws.com/379355014195/comment-moderation-queue",
+        "interval": 10,
+        "unit": "minutes",
+        "deleteMessages": true,
+        "maxMessages": 10
+      },
+      "type": "CUSTOM.awsSqsExtendedTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "119f6ebb-7570-4f02-aba1-24932bca4885",
+      "name": "AWS SQS Trigger",
+      "credentials": {
+        "aws": {
+          "id": "aws-credential",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=너는 댓글 검수 AI야. 아래 댓글을 분석하고 분류 결과에 따라 적절한 툴을 호출해.\n\n## 댓글 정보\n- comment_id: {{ $json.comment_id }}\n- 내용: {{ $json.content }}\n\n## 분류 기준\n1. **delete**: 특정 개인이나 집단을 비하·혐오·조롱하려는 의도가 명확한 경우\n2. **edit**: 비하 의도는 없으나 욕설, 공격적 표현, 과격한 언어가 포함된 경우\n3. **keep**: 위 두 가지에 해당하지 않는 경우\n\n## 원칙\n- 의도를 중심으로 판단해. 강한 표현이 있어도 비하 의도가 없으면 edit으로 분류해.\n- 모호한 경우 더 관대한 기준(keep > edit > delete)을 적용해.\n- edit으로 분류할 경우, 원문의 의미는 최대한 유지하면서 문제 표현만 순화해.\n\n## 처리 규칙\n- **delete**로 분류되면: Delete Comment 툴을 호출해.\n- **edit**으로 분류되면: Purify Comment 툴을 호출해. edited_content에 순화된 댓글 내용을 담아.\n- **keep**으로 분류되면: 툴을 호출하지 말고 판단 이유만 설명해.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        528,
+        -16
+      ],
+      "id": "99edcda4-8876-4e71-baba-74c8972949f1",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = JSON.parse($input.item.json.Body);\nreturn {\n  comment_id: body.comment_id,\n  content: body.content,\n  user_id: body.user_id,\n  lang: body.lang,\n  receipt_handle: $input.item.json.ReceiptHandle\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        176,
+        0
+      ],
+      "id": "1d5707d5-7c9f-45ee-b166-00987ffc479f",
+      "name": "메시지 파싱"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "ac06e3f5-bc55-426b-8bf3-a8b948ee71b6",
+              "leftValue": "={{ $json.content }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        352,
+        0
+      ],
+      "id": "6f7d7ec8-f6be-404d-9aa3-001508f6202a",
+      "name": "메시지 존재여부 확인"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        384,
+        192
+      ],
+      "id": "c1599d0b-2025-4cdd-b09d-319f35609303",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "gemini-api-credential",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "comments",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $fromAI('comment_id', '처리할 댓글의 UUID') }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "is_deleted",
+              "fieldValue": true
+            },
+            {
+              "fieldId": "updated_at",
+              "fieldValue": "={{ $now.toISO() }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        608,
+        192
+      ],
+      "id": "12718a1a-5737-4788-9dc3-d0a127f82cd8",
+      "name": "Delete Comment",
+      "credentials": {
+        "supabaseApi": {
+          "id": "tarot-supabase-api-credential",
+          "name": "Tarot Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "comments",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $fromAI('comment_id', '수정할 댓글의 UUID') }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "is_purified",
+              "fieldValue": true
+            },
+            {
+              "fieldId": "content",
+              "fieldValue": "={{ $fromAI('edited_content', '과격한 표현을 순화한 댓글 내용') }}"
+            },
+            {
+              "fieldId": "updated_at",
+              "fieldValue": "={{ $now.toISO() }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        752,
+        192
+      ],
+      "id": "d3164159-5800-4512-bc0e-324992913244",
+      "name": "Purify Comment",
+      "credentials": {
+        "supabaseApi": {
+          "id": "tarot-supabase-api-credential",
+          "name": "Tarot Supabase account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "AWS SQS Trigger": {
+      "main": [
+        [
+          {
+            "node": "메시지 파싱",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "메시지 파싱": {
+      "main": [
+        [
+          {
+            "node": "메시지 존재여부 확인",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "메시지 존재여부 확인": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete Comment": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Purify Comment": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "36a69217-a459-4e8b-92c7-f846af7cd167",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8d7e870084d4c8c2ba24610cbded0650e0589ddf7f9f0d36a715768a8d84cee7"
+  },
+  "id": "rPoxO6nciZbYqO1k",
+  "tags": []
+}
