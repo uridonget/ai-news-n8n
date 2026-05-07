@@ -15,6 +15,7 @@ services:
       - N8N_PROXY_HOPS=1
       - N8N_BLOCK_ENV_ACCESS_IN_NODE=false
       - N8N_IMPORT_ACTIVE_WORKFLOWS_DEACTIVATED=false
+      - N8N_CUSTOM_EXTENSIONS=/n8n-community-nodes
     entrypoint: ["/entrypoint.sh"]
     volumes:
       - n8n_data:/home/node/.n8n
