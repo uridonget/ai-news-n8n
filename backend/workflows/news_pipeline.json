@@ -313,14 +313,15 @@
     },
     {
       "parameters": {
-        "jsCode": "const originals = $('링크 추출').all();\n\nreturn $input.all().map((item, i) => {\n  const orig = originals[i]?.json || {};\n  const html = item.json.data || '';\n\n  const areaMatch = html.match(/id=[\"']dic_area[\"'][^>]*>([\\s\\S]*?)<\\/article>/);\n  let content = '';\n  if (areaMatch) {\n    content = areaMatch[1]\n      .replace(/<script[\\s\\S]*?<\\/script>/gi, '')\n      .replace(/<style[\\s\\S]*?<\\/style>/gi, '')\n      .replace(/<[^>]+>/g, ' ')\n      .replace(/\\s+/g, ' ')\n      .trim()\n      .slice(0, 2000);\n  }\n\n  const published_date = (() => {\n    try { return new Date(orig.pubDate).toLocaleDateString('sv-SE', { timeZone: 'Asia/Seoul' }); }\n    catch(e) { return new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Seoul' }); }\n  })();\n\n  return {\n    json: {\n      keyword:        orig.keyword,\n      title:          orig.title,\n      url:            orig.url,\n      published_date,\n      content\n    }\n  };\n});"
+        "mode": "runOnceForEachItem",
+        "jsCode": "const orig = $('링크 추출').item.json;\nconst html = $input.item.json.data || '';\n\nconst areaMatch = html.match(/id=[\"']dic_area[\"'][^>]*>([\\s\\S]*?)<\\/article>/);\nlet content = '';\nif (areaMatch) {\n  content = areaMatch[1]\n    .replace(/<script[\\s\\S]*?<\\/script>/gi, '')\n    .replace(/<style[\\s\\S]*?<\\/style>/gi, '')\n    .replace(/<[^>]+>/g, ' ')\n    .replace(/\\s+/g, ' ')\n    .trim()\n    .slice(0, 2000);\n}\n\nconst published_date = (() => {\n  try { return new Date(orig.pubDate).toLocaleDateString('sv-SE', { timeZone: 'Asia/Seoul' }); }\n  catch(e) { return new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Seoul' }); }\n})();\n\nreturn {\n  json: {\n    keyword:        orig.keyword,\n    title:          orig.title,\n    url:            orig.url,\n    published_date,\n    content\n  }\n};"
       },
       "id": "e7a4984a-40e0-43c4-b667-358be6355d3d",
       "name": "본문 추출",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        3168,
+        3360,
         1008
       ]
     },
@@ -333,7 +334,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        3328,
+        3520,
         1008
       ]
     },
@@ -346,7 +347,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        3488,
+        3680,
         1008
       ]
     },
@@ -359,7 +360,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        3936,
+        4128,
         1008
       ]
     },
@@ -372,7 +373,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        4560,
+        4768,
         1008
       ]
     },
@@ -392,7 +393,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 1,
       "position": [
-        4704,
+        4928,
         1008
       ]
     },
@@ -453,6 +454,12 @@
           ]
         },
         "options": {
+          "batching": {
+            "batch": {
+              "batchSize": 1,
+              "batchInterval": 10000
+            }
+          },
           "response": {
             "response": {
               "responseFormat": "text"
@@ -466,6 +473,27 @@
       "typeVersion": 4.2,
       "position": [
         3008,
+        1008
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.error }}",
+              "operation": "isNotEmpty"
+            }
+          ]
+        }
+      },
+      "id": "c1d2e3f4-a5b6-7890-cdef-123456789012",
+      "name": "스크래핑 성공 여부",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        3168,
         1008
       ]
     },
@@ -490,15 +518,15 @@
       "type": "@n8n/n8n-nodes-langchain.googleGemini",
       "typeVersion": 1.1,
       "position": [
-        3648,
+        3840,
         1008
       ],
       "id": "26be128b-1efa-4d6c-8d36-0485258053d1",
       "name": "기사 요약",
       "credentials": {
         "googlePalmApi": {
-          "name": "Google Gemini(PaLM) Api account",
-          "id": "gemini-api-credential"
+          "id": "gemini-api-credential",
+          "name": "Google Gemini(PaLM) Api account"
         }
       }
     },
@@ -530,8 +558,8 @@
       "name": "토픽 추출",
       "credentials": {
         "googlePalmApi": {
-          "name": "Google Gemini(PaLM) Api account",
-          "id": "gemini-api-credential"
+          "id": "gemini-api-credential",
+          "name": "Google Gemini(PaLM) Api account"
         }
       }
     },
@@ -558,7 +586,7 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        4400,
+        4608,
         1008
       ],
       "id": "fc10a28f-6961-481b-9d33-06bb0a5ff36f",
@@ -566,8 +594,8 @@
       "executeOnce": true,
       "credentials": {
         "supabaseApi": {
-          "name": "Supabase account",
-          "id": "supabase-api-credential"
+          "id": "supabase-api-credential",
+          "name": "Supabase account"
         }
       }
     },
@@ -602,7 +630,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        4240,
+        4448,
         1008
       ]
     },
@@ -625,15 +653,15 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        4096,
+        4288,
         1008
       ],
       "id": "60b1e524-2c8e-471f-afd7-faecd2452dd1",
       "name": "topic 저장",
       "credentials": {
         "supabaseApi": {
-          "name": "Supabase account",
-          "id": "supabase-api-credential"
+          "id": "supabase-api-credential",
+          "name": "Supabase account"
         }
       }
     },
@@ -1013,6 +1041,24 @@
       "main": [
         [
           {
+            "node": "스크래핑 성공 여부",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "스크래핑 성공 여부": {
+      "main": [
+        [
+          {
+            "node": "20초 대기",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
             "node": "본문 추출",
             "type": "main",
             "index": 0
@@ -1103,10 +1149,10 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "bd15c7e8-e812-4492-bdac-131ea46b60d9",
+  "versionId": "393ccd7d-c96b-4de0-aeec-17c45c7dbbdb",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "d7602ed70a080880ee2bf6d08ea0692f805408af647865f14f7c63b06bfa917e"
+    "instanceId": "9a724253f7f0383fbb8ba693062f375ebe10191459a4c0c1ba070ee6443412f6"
   },
   "id": "8RgNHLilKLHrpuZq",
   "tags": []
